@@ -1,0 +1,93 @@
+[
+  {
+    "name": "vr-0",
+    "maximum_districts": 23,
+    "maximum_generator_districts": 8,
+    "maximum_mining_districts": 15,
+    "maximum_agriculture_districts": 0
+  },
+  {
+    "name": "vr-1",
+    "maximum_districts": 16,
+    "maximum_generator_districts": 4,
+    "maximum_mining_districts": 5,
+    "maximum_agriculture_districts": 3
+  },
+  {
+    "name": "vr-2",
+    "maximum_districts": 14,
+    "maximum_generator_districts": 3,
+    "maximum_mining_districts": 9,
+    "maximum_agriculture_districts": 9
+  },
+  {
+    "name": "vr-3",
+    "maximum_districts": 12,
+    "maximum_generator_districts": 5,
+    "maximum_mining_districts": 5,
+    "maximum_agriculture_districts": 6
+  },
+  {
+    "name": "vr-4",
+    "maximum_districts": 15,
+    "maximum_generator_districts": 4,
+    "maximum_mining_districts": 5,
+    "maximum_agriculture_districts": 5
+  },
+  {
+    "name": "vr-5",
+    "maximum_districts": 17,
+    "maximum_generator_districts": 4,
+    "maximum_mining_districts": 9,
+    "maximum_agriculture_districts": 7
+  },
+  {
+    "name": "vr-6",
+    "maximum_districts": 17,
+    "maximum_generator_districts": 5,
+    "maximum_mining_districts": 7,
+    "maximum_agriculture_districts": 9
+  },
+  {
+    "name": "vu-0",
+    "maximum_districts": 21,
+    "maximum_generator_districts": 11,
+    "maximum_mining_districts": 18,
+    "maximum_agriculture_districts": 4
+  },
+  {
+    "name": "c-0",
+    "maximum_districts": 14,
+    "maximum_generator_districts": 4,
+    "maximum_mining_districts": 6,
+    "maximum_agriculture_districts": 3
+  },
+  {
+    "name": "c-1",
+    "maximum_districts": 15,
+    "maximum_generator_districts": 4,
+    "maximum_mining_districts": 2,
+    "maximum_agriculture_districts": 6
+  },
+  {
+    "name": "vu-1",
+    "maximum_districts": 13,
+    "maximum_generator_districts": 4,
+    "maximum_mining_districts": 4,
+    "maximum_agriculture_districts": 7
+  },
+  {
+    "name": "vur-0",
+    "maximum_districts": 20,
+    "maximum_generator_districts": 6,
+    "maximum_mining_districts": 7,
+    "maximum_agriculture_districts": 5
+  },
+  {
+    "name": "vur-1",
+    "maximum_districts": 13,
+    "maximum_generator_districts": 3,
+    "maximum_mining_districts": 0,
+    "maximum_agriculture_districts": 5
+  }
+]
