@@ -1,3 +1,4 @@
+import modifiers
 import jobs
 
 
@@ -11,7 +12,6 @@ class District(object):
         self.trade = 0
         self.goods = 0
         self.alloys = 0
-        self.influence = 0
         self.unity = 0
         self.physics = 0
         self.society = 0
@@ -19,40 +19,41 @@ class District(object):
         self.motes = 0
         self.gases = 0
         self.crystals = 0
-        self.metals = 0
-        self.zro = 0
-        self.matter = 0
-        self.nanites = 0
-        self.admin = 0
+        self.admin = -1
         self.naval = 0
-        self.jobs = []
+        self.jobs_slots = []
+
+    def aggregate_resources(self):
+        return {
+            "housing": self.housing + sum(j.housing for j in self.jobs_slots),
+            "amenities": self.amenities + sum(j.amenities for j in self.jobs_slots),
+            "energy": self.energy + sum(j.energy for j in self.jobs_slots),
+            "minerals": self.minerals + sum(j.minerals for j in self.jobs_slots),
+            "food": self.food + sum(j.food for j in self.jobs_slots),
+            "trade": self.trade + sum(j.trade for j in self.jobs_slots),
+            "goods": self.goods + sum(j.goods for j in self.jobs_slots),
+            "alloys": self.alloys + sum(j.alloys for j in self.jobs_slots),
+            "unity": self.unity + sum(j.unity for j in self.jobs_slots),
+            "research": self.physics
+            + sum(j.physics for j in self.jobs_slots)
+            + self.society
+            + sum(j.society for j in self.jobs_slots)
+            + self.engineering
+            + sum(j.engineering for j in self.jobs_slots),
+            "motes": self.motes + sum(j.motes for j in self.jobs_slots),
+            "gases": self.gases + sum(j.gases for j in self.jobs_slots),
+            "crystals": self.crystals + sum(j.crystals for j in self.jobs_slots),
+            "admin": self.admin + sum(j.admin for j in self.jobs_slots),
+            "naval": self.naval + sum(j.naval for j in self.jobs_slots),
+            "jobs": len(self.jobs_slots),
+        }
 
 
 class CityDistrict(District):
     def __init__(self):
+        super().__init__()
         self.housing = 5
-        self.amenities = 0
         self.energy = -2
-        self.minerals = 0
-        self.food = 0
-        self.trade = 0
-        self.goods = 0
-        self.alloys = 0
-        self.influence = 0
-        self.unity = 0
-        self.physics = 0
-        self.society = 0
-        self.engineering = 0
-        self.motes = 0
-        self.gases = 0
-        self.crystals = 0
-        self.metals = 0
-        self.zro = 0
-        self.matter = 0
-        self.nanites = 0
-        self.admin = 0
-        self.naval = 0
-        self.jobs = []
 
         self.clerks = 1
 
@@ -68,34 +69,14 @@ class CityDistrict(District):
             self.housing += 1
 
         for j in range(self.clerks):
-            self.jobs.append(jobs.Clerk)
+            self.jobs_slots.append(jobs.Clerk())
 
 
 class HiveDistrict(District):
     def __init__(self):
+        super().__init__()
         self.housing = 6
-        self.amenities = 0
         self.energy = -2
-        self.minerals = 0
-        self.food = 0
-        self.trade = 0
-        self.goods = 0
-        self.alloys = 0
-        self.influence = 0
-        self.unity = 0
-        self.physics = 0
-        self.society = 0
-        self.engineering = 0
-        self.motes = 0
-        self.gases = 0
-        self.crystals = 0
-        self.metals = 0
-        self.zro = 0
-        self.matter = 0
-        self.nanites = 0
-        self.admin = 0
-        self.naval = 0
-        self.jobs = []
 
         self.maintenance_drones = 3
 
@@ -116,34 +97,14 @@ class HiveDistrict(District):
             self.maintenance_drones += 1
 
         for j in range(self.maintenance_drones):
-            self.jobs.append(jobs.MaintenanceDrones)
+            self.jobs_slots.append(jobs.MaintenanceDrone())
 
 
 class NexusDistrict(District):
     def __init__(self):
+        super().__init__()
         self.housing = 5
-        self.amenities = 0
         self.energy = -2
-        self.minerals = 0
-        self.food = 0
-        self.trade = 0
-        self.goods = 0
-        self.alloys = 0
-        self.influence = 0
-        self.unity = 0
-        self.physics = 0
-        self.society = 0
-        self.engineering = 0
-        self.motes = 0
-        self.gases = 0
-        self.crystals = 0
-        self.metals = 0
-        self.zro = 0
-        self.matter = 0
-        self.nanites = 0
-        self.admin = 0
-        self.naval = 0
-        self.jobs = []
 
         self.maintenance_drones = 3
 
@@ -160,34 +121,15 @@ class NexusDistrict(District):
             self.maintenance_drones += 1
 
         for j in range(self.maintenance_drones):
-            self.jobs.append(jobs.MaintenanceDrones)
+            self.jobs_slots.append(jobs.MaintenanceDrone())
 
 
 class GeneratorDistrict(District):
     def __init__(self):
+        super().__init__()
         self.housing = 2
-        self.amenities = 0
+
         self.energy = -1
-        self.minerals = 0
-        self.food = 0
-        self.trade = 0
-        self.goods = 0
-        self.alloys = 0
-        self.influence = 0
-        self.unity = 0
-        self.physics = 0
-        self.society = 0
-        self.engineering = 0
-        self.motes = 0
-        self.gases = 0
-        self.crystals = 0
-        self.metals = 0
-        self.zro = 0
-        self.matter = 0
-        self.nanites = 0
-        self.admin = 0
-        self.naval = 0
-        self.jobs = []
 
         self.technicians = 2
         self.tech_drones = 0
@@ -203,36 +145,17 @@ class GeneratorDistrict(District):
             self.housing = 3
 
         for c in range(self.technicians):
-            self.jobs.append(jobs.Technician)
+            self.jobs_slots.append(jobs.Technician())
         for c in range(self.tech_drones):
-            self.jobs.append(jobs.TechDrone)
+            self.jobs_slots.append(jobs.TechDrone())
 
 
 class MiningDistrict(District):
     def __init__(self):
+        super().__init__()
         self.housing = 2
-        self.amenities = 0
+
         self.energy = -1
-        self.minerals = 0
-        self.food = 0
-        self.trade = 0
-        self.goods = 0
-        self.alloys = 0
-        self.influence = 0
-        self.unity = 0
-        self.physics = 0
-        self.society = 0
-        self.engineering = 0
-        self.motes = 0
-        self.gases = 0
-        self.crystals = 0
-        self.metals = 0
-        self.zro = 0
-        self.matter = 0
-        self.nanites = 0
-        self.admin = 0
-        self.naval = 0
-        self.jobs = []
 
         self.miners = 2
         self.mining_drones = 0
@@ -248,36 +171,17 @@ class MiningDistrict(District):
             self.housing = 3
 
         for c in range(self.miners):
-            self.jobs.append(jobs.Miner)
+            self.jobs_slots.append(jobs.Miner())
         for c in range(self.mining_drones):
-            self.jobs.append(jobs.MiningDrone)
+            self.jobs_slots.append(jobs.MiningDrone())
 
 
 class AgricultureDistrict(District):
     def __init__(self):
+        super().__init__()
         self.housing = 2
-        self.amenities = 0
+
         self.energy = -1
-        self.minerals = 0
-        self.food = 0
-        self.trade = 0
-        self.goods = 0
-        self.alloys = 0
-        self.influence = 0
-        self.unity = 0
-        self.physics = 0
-        self.society = 0
-        self.engineering = 0
-        self.motes = 0
-        self.gases = 0
-        self.crystals = 0
-        self.metals = 0
-        self.zro = 0
-        self.matter = 0
-        self.nanites = 0
-        self.admin = 0
-        self.naval = 0
-        self.jobs = []
 
         self.farmers = 2
         self.agri_drones = 0
@@ -295,6 +199,6 @@ class AgricultureDistrict(District):
                 self.housing = 4
 
         for c in range(self.farmers):
-            self.jobs.append(jobs.Farmer)
+            self.jobs_slots.append(jobs.Farmer())
         for c in range(self.agri_drones):
-            self.jobs.append(jobs.AgriDrones)
+            self.jobs_slots.append(jobs.AgriDrone())

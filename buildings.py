@@ -1,8 +1,10 @@
+import modifiers
 import jobs
 
 
 class Building(object):
     def __init__(self):
+        self.name = "Building"
         self.housing = 0
         self.amenities = 0
         self.energy = 0
@@ -11,7 +13,6 @@ class Building(object):
         self.trade = 0
         self.goods = 0
         self.alloys = 0
-        self.influence = 0
         self.unity = 0
         self.physics = 0
         self.society = 0
@@ -19,40 +20,47 @@ class Building(object):
         self.motes = 0
         self.gases = 0
         self.crystals = 0
-        self.metals = 0
-        self.zro = 0
-        self.matter = 0
-        self.nanites = 0
         self.admin = 0
         self.naval = 0
-        self.jobs = []
+        self.jobs_slots = []
+
+    def aggregate_resources(self):
+        return {
+            "housing": self.housing + sum(j.housing for j in self.jobs_slots),
+            "amenities": self.amenities + sum(j.amenities for j in self.jobs_slots),
+            "energy": self.energy + sum(j.energy for j in self.jobs_slots),
+            "minerals": self.minerals + sum(j.minerals for j in self.jobs_slots),
+            "food": self.food + sum(j.food for j in self.jobs_slots),
+            "trade": self.trade + sum(j.trade for j in self.jobs_slots),
+            "goods": self.goods + sum(j.goods for j in self.jobs_slots),
+            "alloys": self.alloys + sum(j.alloys for j in self.jobs_slots),
+            "unity": self.unity + sum(j.unity for j in self.jobs_slots),
+            "research": (
+                self.physics
+                + sum(j.physics for j in self.jobs_slots)
+                + self.society
+                + sum(j.society for j in self.jobs_slots)
+                + self.engineering
+                + sum(j.engineering for j in self.jobs_slots)
+            )
+            / 3,
+            "motes": self.motes + sum(j.motes for j in self.jobs_slots),
+            "gases": self.gases + sum(j.gases for j in self.jobs_slots),
+            "crystals": self.crystals + sum(j.crystals for j in self.jobs_slots),
+            "admin": self.admin + sum(j.admin for j in self.jobs_slots),
+            "naval": self.naval + sum(j.naval for j in self.jobs_slots),
+            "jobs": len(self.jobs_slots),
+        }
 
 
 class SystemCapitalComplex(Building):
     def __init__(self):
+        super().__init__()
+        self.name = "SystemCapitalComplex"
+
         self.housing = 10
         self.amenities = 10
         self.energy = -10
-        self.minerals = 0
-        self.food = 0
-        self.trade = 0
-        self.goods = 0
-        self.alloys = 0
-        self.influence = 0
-        self.unity = 0
-        self.physics = 0
-        self.society = 0
-        self.engineering = 0
-        self.motes = 0
-        self.gases = 0
-        self.crystals = 0
-        self.metals = 0
-        self.zro = 0
-        self.matter = 0
-        self.nanites = 0
-        self.admin = 0
-        self.naval = 0
-        self.jobs = []
 
         self.administrators = 4
         self.enforcers = 3
@@ -78,52 +86,34 @@ class SystemCapitalComplex(Building):
         if "corporate" in modifiers.authority:
             self.administrators -= 4
             self.executives += 4
-        if "synthetic_evolution" in modifiers.ascension_perks:
+        if "synthetic_evolution" in modifiers.perks:
             self.roboticists += 3
 
         for c in range(self.administrators):
-            self.jobs.append(jobs.Administrator)
+            self.jobs_slots.append(jobs.Administrator())
         for c in range(self.enforcers):
-            self.jobs.append(jobs.Enforcer)
+            self.jobs_slots.append(jobs.Enforcer())
         for c in range(self.nobles):
-            self.jobs.append(jobs.Noble)
+            self.jobs_slots.append(jobs.Noble())
         for c in range(self.high_priests):
-            self.jobs.append(jobs.HighPriests)
+            self.jobs_slots.append(jobs.HighPriest())
         for c in range(self.merchants):
-            self.jobs.append(jobs.Merchant)
+            self.jobs_slots.append(jobs.Merchant())
         for c in range(self.science_directors):
-            self.jobs.append(jobs.ScienceDirector)
+            self.jobs_slots.append(jobs.ScienceDirector())
         for c in range(self.executives):
-            self.jobs.append(jobs.Executive)
+            self.jobs_slots.append(jobs.Executive())
         for c in range(self.roboticists):
-            self.jobs.append(jobs.Roboticist)
+            self.jobs_slots.append(jobs.Roboticist())
 
 
 class AlloyNanoPlants(Building):
     def __init__(self):
-        self.housing = 0
-        self.amenities = 0
+        super().__init__()
+        self.name = "AlloyNanoPlants"
+
         self.energy = -8
-        self.minerals = 0
-        self.food = 0
-        self.trade = 0
-        self.goods = 0
-        self.alloys = 0
-        self.influence = 0
-        self.unity = 0
-        self.physics = 0
-        self.society = 0
-        self.engineering = 0
         self.motes = -2
-        self.gases = 0
-        self.crystals = 0
-        self.metals = 0
-        self.zro = 0
-        self.matter = 0
-        self.nanites = 0
-        self.admin = 0
-        self.naval = 0
-        self.jobs = []
 
         self.metallurgists = 8
         self.foundry_drone = 0
@@ -139,38 +129,20 @@ class AlloyNanoPlants(Building):
             self.fabricator = 8
 
         for c in range(self.metallurgists):
-            self.jobs.append(jobs.Metallurgist)
+            self.jobs_slots.append(jobs.Metallurgist())
         for c in range(self.foundry_drone):
-            self.jobs.append(jobs.FoundryDrone)
+            self.jobs_slots.append(jobs.FoundryDrone())
         for c in range(self.fabricator):
-            self.jobs.append(jobs.Fabricator)
+            self.jobs_slots.append(jobs.Fabricator())
 
 
 class AdvancedResearchComplexes(Building):
     def __init__(self):
-        self.housing = 0
-        self.amenities = 0
+        super().__init__()
+        self.name = "AdvancedResearchComplexes"
+
         self.energy = -8
-        self.minerals = 0
-        self.food = 0
-        self.trade = 0
-        self.goods = 0
-        self.alloys = 0
-        self.influence = 0
-        self.unity = 0
-        self.physics = 0
-        self.society = 0
-        self.engineering = 0
-        self.motes = 0
         self.gases = -2
-        self.crystals = 0
-        self.metals = 0
-        self.zro = 0
-        self.matter = 0
-        self.nanites = 0
-        self.admin = 0
-        self.naval = 0
-        self.jobs = []
 
         self.researchers = 8
         self.brain_drone = 0
@@ -186,38 +158,19 @@ class AdvancedResearchComplexes(Building):
             self.calculators = 8
 
         for c in range(self.researchers):
-            self.jobs.append(jobs.Researcher)
+            self.jobs_slots.append(jobs.Researcher())
         for c in range(self.brain_drone):
-            self.jobs.append(jobs.BrainDrone)
+            self.jobs_slots.append(jobs.BrainDrone())
         for c in range(self.calculators):
-            self.jobs.append(jobs.Calculator)
+            self.jobs_slots.append(jobs.Calculator())
 
 
 class CivilianRepliComplexes(Building):
     def __init__(self):
-        self.housing = 0
-        self.amenities = 0
+        super().__init__()
+        self.name = "CivilianRepliComplexes"
         self.energy = -8
-        self.minerals = 0
-        self.food = 0
-        self.trade = 0
-        self.goods = 0
-        self.alloys = 0
-        self.influence = 0
-        self.unity = 0
-        self.physics = 0
-        self.society = 0
-        self.engineering = 0
-        self.motes = 0
-        self.gases = 0
         self.crystals = -2
-        self.metals = 0
-        self.zro = 0
-        self.matter = 0
-        self.nanites = 0
-        self.admin = 0
-        self.naval = 0
-        self.jobs = []
 
         self.artisans = 8
         self.artisan_drones = 0
@@ -227,196 +180,82 @@ class CivilianRepliComplexes(Building):
             self.artisan_drones = 8
 
         for c in range(self.artisans):
-            self.jobs.append(jobs.Artisan)
+            self.jobs_slots.append(jobs.Artisan())
         for c in range(self.artisan_drones):
-            self.jobs.append(jobs.ArtisanDrone)
+            self.jobs_slots.append(jobs.ArtisanDrone())
 
 
 class HypercommsForum(Building):
     def __init__(self):
-        self.housing = 0
-        self.amenities = 0
+        super().__init__()
+        self.name = "HypercommsForum"
         self.energy = -8
-        self.minerals = 0
-        self.food = 0
-        self.trade = 0
-        self.goods = 0
-        self.alloys = 0
-        self.influence = 0
-        self.unity = 0
-        self.physics = 0
-        self.society = 0
-        self.engineering = 0
-        self.motes = 0
-        self.gases = 0
         self.crystals = -2
-        self.metals = 0
-        self.zro = 0
-        self.matter = 0
-        self.nanites = 0
-        self.admin = 0
-        self.naval = 0
-        self.jobs = []
 
         self.culture_workers = 8
 
         for c in range(self.culture_workers):
-            self.jobs.append(jobs.CultureWorker)
+            self.jobs_slots.append(jobs.CultureWorker())
 
 
 class SacredNexus(Building):
     def __init__(self):
-        self.housing = 0
-        self.amenities = 0
+        super().__init__()
+        self.name = "SacredNexus"
         self.energy = -8
-        self.minerals = 0
-        self.food = 0
-        self.trade = 0
-        self.goods = 0
-        self.alloys = 0
-        self.influence = 0
-        self.unity = 0
-        self.physics = 0
-        self.society = 0
-        self.engineering = 0
-        self.motes = 0
-        self.gases = 0
         self.crystals = -2
-        self.metals = 0
-        self.zro = 0
-        self.matter = 0
-        self.nanites = 0
-        self.admin = 0
-        self.naval = 0
-        self.jobs = []
 
         self.priests = 8
 
         for c in range(self.priests):
-            self.jobs.append(jobs.Priest)
+            self.jobs_slots.append(jobs.Priest())
 
 
 class SynergyForum(Building):
     def __init__(self):
-        self.housing = 0
-        self.amenities = 0
+        super().__init__()
+        self.name = "SynergyForum"
         self.energy = -8
-        self.minerals = 0
-        self.food = 0
-        self.trade = 0
-        self.goods = 0
-        self.alloys = 0
-        self.influence = 0
-        self.unity = 0
-        self.physics = 0
-        self.society = 0
-        self.engineering = 0
-        self.motes = 0
-        self.gases = 0
         self.crystals = -2
-        self.metals = 0
-        self.zro = 0
-        self.matter = 0
-        self.nanites = 0
-        self.admin = 0
-        self.naval = 0
-        self.jobs = []
 
         self.managers = 8
 
         for c in range(self.managers):
-            self.jobs.append(jobs.Manager)
+            self.jobs_slots.append(jobs.Manager())
 
 
 class ConfluenceOfThought(Building):
     def __init__(self):
-        self.housing = 0
-        self.amenities = 0
+        super().__init__()
+        self.name = "ConfluenceOfThought"
         self.energy = -8
-        self.minerals = 0
-        self.food = 0
-        self.trade = 0
-        self.goods = 0
-        self.alloys = 0
-        self.influence = 0
-        self.unity = 0
-        self.physics = 0
-        self.society = 0
-        self.engineering = 0
-        self.motes = 0
         self.gases = -2
-        self.crystals = 0
-        self.metals = 0
-        self.zro = 0
-        self.matter = 0
-        self.nanites = 0
-        self.admin = 0
-        self.naval = 0
-        self.jobs = []
 
         self.synapse_drones = 8
 
         for c in range(self.synapse_drones):
-            self.jobs.append(jobs.SynapseDrone)
+            self.jobs_slots.append(jobs.SynapseDrone())
 
 
 class SimulationComplex(Building):
     def __init__(self):
-        self.housing = 0
-        self.amenities = 0
+        super().__init__()
+        self.name = "SimulationComplex"
         self.energy = -8
-        self.minerals = 0
-        self.food = 0
-        self.trade = 0
-        self.goods = 0
-        self.alloys = 0
-        self.influence = 0
-        self.unity = 0
-        self.physics = 0
-        self.society = 0
-        self.engineering = 0
-        self.motes = 0
-        self.gases = 0
         self.crystals = -2
-        self.metals = 0
-        self.zro = 0
-        self.matter = 0
-        self.nanites = 0
-        self.admin = 0
-        self.naval = 0
-        self.jobs = []
 
         self.evaluators = 8
 
         for c in range(self.evaluators):
-            self.jobs.append(jobs.Evaluator)
+            self.jobs_slots.append(jobs.Evaluator())
 
 
 class HyperEntertainmentForums(Building):
     def __init__(self):
-        self.housing = 0
-        self.amenities = 0
+        super().__init__()
+        self.name = "HyperEntertainmentForums"
         self.energy = -5
-        self.minerals = 0
-        self.food = 0
-        self.trade = 0
-        self.goods = 0
-        self.alloys = 0
-        self.influence = 0
-        self.unity = 0
-        self.physics = 0
-        self.society = 0
-        self.engineering = 0
-        self.motes = 0
         self.gases = -1
-        self.crystals = 0
-        self.metals = 0
-        self.zro = 0
-        self.matter = 0
-        self.nanites = 0
-        self.admin = 0
-        self.naval = 0
-        self.jobs = []
 
         self.entertainers = 5
         self.duelists = 0
@@ -426,162 +265,67 @@ class HyperEntertainmentForums(Building):
             self.duelists = 5
 
         for c in range(self.entertainers):
-            self.jobs.append(jobs.Entertainer)
+            self.jobs_slots.append(jobs.Entertainer())
         for c in range(self.duelists):
-            self.jobs.append(jobs.Duelists)
+            self.jobs_slots.append(jobs.Duelist())
 
 
 class AdministrativePark(Building):
     def __init__(self):
-        self.housing = 0
-        self.amenities = 0
+        super().__init__()
+        self.name = "AdministrativePark"
         self.energy = -5
-        self.minerals = 0
-        self.food = 0
-        self.trade = 0
-        self.goods = 0
-        self.alloys = 0
-        self.influence = 0
-        self.unity = 0
-        self.physics = 0
-        self.society = 0
-        self.engineering = 0
-        self.motes = 0
-        self.gases = 0
         self.crystals = -1
-        self.metals = 0
-        self.zro = 0
-        self.matter = 0
-        self.nanites = 0
-        self.admin = 0
-        self.naval = 0
-        self.jobs = []
 
         self.bureaucrats = 5
 
         for c in range(self.bureaucrats):
-            self.jobs.append(jobs.Bureaucrat)
+            self.jobs_slots.append(jobs.Bureaucrat())
 
 
 class SystemConflux(Building):
     def __init__(self):
-        self.housing = 0
-        self.amenities = 0
+        super().__init__()
+        self.name = "SystemConflux"
         self.energy = -8
-        self.minerals = 0
-        self.food = 0
-        self.trade = 0
-        self.goods = 0
-        self.alloys = 0
-        self.influence = 0
-        self.unity = 0
-        self.physics = 0
-        self.society = 0
-        self.engineering = 0
-        self.motes = 0
-        self.gases = 0
         self.crystals = -2
-        self.metals = 0
-        self.zro = 0
-        self.matter = 0
-        self.nanites = 0
-        self.admin = 0
-        self.naval = 0
-        self.jobs = []
 
         self.coordinators = 8
 
         for c in range(self.coordinators):
-            self.jobs.append(jobs.Coordinator)
+            self.jobs_slots.append(jobs.Coordinator())
 
 
 class HallOfJudgement(Building):
     def __init__(self):
-        self.housing = 0
-        self.amenities = 0
+        super().__init__()
+        self.name = "HallOfJudgement"
         self.energy = -5
-        self.minerals = 0
-        self.food = 0
-        self.trade = 0
-        self.goods = 0
-        self.alloys = 0
-        self.influence = 0
-        self.unity = 0
-        self.physics = 0
-        self.society = 0
-        self.engineering = 0
-        self.motes = 0
         self.gases = -1
-        self.crystals = 0
-        self.metals = 0
-        self.zro = 0
-        self.matter = 0
-        self.nanites = 0
-        self.admin = 0
-        self.naval = 0
-        self.jobs = []
 
         self.enforcers = 5
 
         for c in range(self.enforcers):
-            self.jobs.append(jobs.Enforcer)
+            self.jobs_slots.append(jobs.Enforcer())
 
 
 class SentinelPosts(Building):
     def __init__(self):
-        self.housing = 0
-        self.amenities = 0
+        super().__init__()
+        self.name = "SentinelPosts"
         self.energy = -2
-        self.minerals = 0
-        self.food = 0
-        self.trade = 0
-        self.goods = 0
-        self.alloys = 0
-        self.influence = 0
-        self.unity = 0
-        self.physics = 0
-        self.society = 0
-        self.engineering = 0
-        self.motes = 0
-        self.gases = 0
-        self.crystals = 0
-        self.metals = 0
-        self.zro = 0
-        self.matter = 0
-        self.nanites = 0
-        self.admin = 0
-        self.naval = 0
-        self.jobs = []
 
         self.hunter_seeker_drones = 2
 
         for c in range(self.hunter_seeker_drones):
-            self.jobs.append(jobs.HunterSeekerDrone)
+            self.jobs_slots.append(jobs.HunterSeekerDrone())
+
+
 class HydroponicsFarms(Building):
     def __init__(self):
-        self.housing = 0
-        self.amenities = 0
+        super().__init__()
+        self.name = "HydroponicsFarms"
         self.energy = -2
-        self.minerals = 0
-        self.food = 0
-        self.trade = 0
-        self.goods = 0
-        self.alloys = 0
-        self.influence = 0
-        self.unity = 0
-        self.physics = 0
-        self.society = 0
-        self.engineering = 0
-        self.motes = 0
-        self.gases = 0
-        self.crystals = 0
-        self.metals = 0
-        self.zro = 0
-        self.matter = 0
-        self.nanites = 0
-        self.admin = 0
-        self.naval = 0
-        self.jobs = []
 
         self.farmers = 2
         self.agri_drones = 0
@@ -591,1020 +335,504 @@ class HydroponicsFarms(Building):
             self.agri_drones = 2
 
         for c in range(self.farmers):
-            self.jobs.append(jobs.Farmer)
+            self.jobs_slots.append(jobs.Farmer())
         for c in range(self.agri_drones):
-            self.jobs.append(jobs.AgriDrone)
+            self.jobs_slots.append(jobs.AgriDrone())
+
+
 class CommerceMegaplexes(Building):
     def __init__(self):
-        self.housing = 0
-        self.amenities = 0
+        super().__init__()
+        self.name = "CommerceMegaplexes"
         self.energy = -5
-        self.minerals = 0
-        self.food = 0
-        self.trade = 0
-        self.goods = 0
-        self.alloys = 0
-        self.influence = 0
-        self.unity = 0
-        self.physics = 0
-        self.society = 0
-        self.engineering = 0
-        self.motes = 0
-        self.gases = 0
         self.crystals = -1
-        self.metals = 0
-        self.zro = 0
-        self.matter = 0
-        self.nanites = 0
-        self.admin = 0
-        self.naval = 0
-        self.jobs = []
 
         self.clerks = 10
         self.merchants = 1
 
         for c in range(self.clerks):
-            self.jobs.append(jobs.Clerk)
+            self.jobs_slots.append(jobs.Clerk())
         for c in range(self.merchants):
-            self.jobs.append(jobs.Merchant)
+            self.jobs_slots.append(jobs.Merchant())
+
+
 class ChemicalPlants(Building):
     def __init__(self):
-        self.housing = 0
-        self.amenities = 0
+        super().__init__()
+        self.name = "ChemicalPlants"
         self.energy = -3
-        self.minerals = 0
-        self.food = 0
-        self.trade = 0
-        self.goods = 0
-        self.alloys = 0
-        self.influence = 0
-        self.unity = 0
-        self.physics = 0
-        self.society = 0
-        self.engineering = 0
-        self.motes = 0
-        self.gases = 0
-        self.crystals = 0
-        self.metals = 0
-        self.zro = 0
-        self.matter = 0
-        self.nanites = 0
-        self.admin = 0
-        self.naval = 0
-        self.jobs = []
 
         self.chemists = 1
         self.chem_drones = 0
 
-        if "hive_mind" in modifiers.authority or "machine_intelligence" in modifiers.authority:
+        if (
+            "hive_mind" in modifiers.authority
+            or "machine_intelligence" in modifiers.authority
+        ):
             self.chemists = 0
             self.chem_drones = 1
 
         for j in range(self.chemists):
-            self.jobs.append(jobs.Chemist)
+            self.jobs_slots.append(jobs.Chemist())
         for j in range(self.chem_drones):
-            self.jobs.append(jobs.ChemDrone)
+            self.jobs_slots.append(jobs.ChemDrone())
+
+
 class ExoticGasRefineries(Building):
     def __init__(self):
-        self.housing = 0
-        self.amenities = 0
+        super().__init__()
+        self.name = "ExoticGasRefineries"
         self.energy = -3
-        self.minerals = 0
-        self.food = 0
-        self.trade = 0
-        self.goods = 0
-        self.alloys = 0
-        self.influence = 0
-        self.unity = 0
-        self.physics = 0
-        self.society = 0
-        self.engineering = 0
-        self.motes = 0
-        self.gases = 0
-        self.crystals = 0
-        self.metals = 0
-        self.zro = 0
-        self.matter = 0
-        self.nanites = 0
-        self.admin = 0
-        self.naval = 0
-        self.jobs = []
 
         self.gas_refiners = 1
         self.refinery_drones = 0
 
-        if "hive_mind" in modifiers.authority or "machine_intelligence" in modifiers.authority:
+        if (
+            "hive_mind" in modifiers.authority
+            or "machine_intelligence" in modifiers.authority
+        ):
             self.gas_refiners = 0
             self.refinery_drones = 1
 
         for j in range(self.gas_refiners):
-            self.jobs.append(jobs.GasRefiner)
+            self.jobs_slots.append(jobs.GasRefiner())
         for j in range(self.refinery_drones):
-            self.jobs.append(jobs.RefineryDrone)
+            self.jobs_slots.append(jobs.RefineryDrone())
+
+
 class SyntheticCrystalPlants(Building):
     def __init__(self):
-        self.housing = 0
-        self.amenities = 0
+        super().__init__()
+        self.name = "SyntheticCrystalPlants"
         self.energy = -3
-        self.minerals = 0
-        self.food = 0
-        self.trade = 0
-        self.goods = 0
-        self.alloys = 0
-        self.influence = 0
-        self.unity = 0
-        self.physics = 0
-        self.society = 0
-        self.engineering = 0
-        self.motes = 0
-        self.gases = 0
-        self.crystals = 0
-        self.metals = 0
-        self.zro = 0
-        self.matter = 0
-        self.nanites = 0
-        self.admin = 0
-        self.naval = 0
-        self.jobs = []
 
-        self.translucers  = 1
+        self.translucers = 1
         self.lensing_drones = 0
 
-        if "hive_mind" in modifiers.authority or "machine_intelligence" in modifiers.authority:
+        if (
+            "hive_mind" in modifiers.authority
+            or "machine_intelligence" in modifiers.authority
+        ):
             self.translucers = 0
             self.lensing_drones = 1
 
         for j in range(self.translucers):
-            self.jobs.append(jobs.Translucer)
+            self.jobs_slots.append(jobs.Translucer())
         for j in range(self.lensing_drones):
-            self.jobs.append(jobs.LensingDrone)
+            self.jobs_slots.append(jobs.LensingDrone())
+
+
 class ParadiseDome(Building):
     def __init__(self):
+        super().__init__()
+        self.name = "ParadiseDome"
         self.housing = 6
         self.amenities = 10
         self.energy = -3
-        self.minerals = 0
-        self.food = 0
-        self.trade = 0
-        self.goods = 0
-        self.alloys = 0
-        self.influence = 0
-        self.unity = 0
-        self.physics = 0
-        self.society = 0
-        self.engineering = 0
-        self.motes = 0
-        self.gases = 0
         self.crystals = -1
-        self.metals = 0
-        self.zro = 0
-        self.matter = 0
-        self.nanites = 0
-        self.admin = 0
-        self.naval = 0
-        self.jobs = []
+
+
 class UtopianCommunalHousing(Building):
     def __init__(self):
+        super().__init__()
+        self.name = "UtopianCommunalHousing"
         self.housing = 10
         self.amenities = 6
         self.energy = -3
-        self.minerals = 0
-        self.food = 0
-        self.trade = 0
-        self.goods = 0
-        self.alloys = 0
-        self.influence = 0
-        self.unity = 0
-        self.physics = 0
-        self.society = 0
-        self.engineering = 0
-        self.motes = 0
-        self.gases = 0
         self.crystals = -1
-        self.metals = 0
-        self.zro = 0
-        self.matter = 0
-        self.nanites = 0
-        self.admin = 0
-        self.naval = 0
-        self.jobs = []
+
+
 class ExpandedWarren(Building):
     def __init__(self):
+        super().__init__()
+        self.name = "ExpandedWarren"
         self.housing = 6
         self.amenities = 10
         self.energy = -3
-        self.minerals = 0
-        self.food = 0
-        self.trade = 0
-        self.goods = 0
-        self.alloys = 0
-        self.influence = 0
-        self.unity = 0
-        self.physics = 0
-        self.society = 0
-        self.engineering = 0
-        self.motes = 0
-        self.gases = 0
         self.crystals = -1
-        self.metals = 0
-        self.zro = 0
-        self.matter = 0
-        self.nanites = 0
-        self.admin = 0
-        self.naval = 0
-        self.jobs = []
+
+
 class UpgradedDroneStorage(Building):
     def __init__(self):
+        super().__init__()
+        self.name = "UpgradedDroneStorage"
         self.housing = 8
         self.amenities = 6
         self.energy = -3
-        self.minerals = 0
-        self.food = 0
-        self.trade = 0
-        self.goods = 0
-        self.alloys = 0
-        self.influence = 0
-        self.unity = 0
-        self.physics = 0
-        self.society = 0
-        self.engineering = 0
-        self.motes = 0
-        self.gases = 0
         self.crystals = -1
-        self.metals = 0
-        self.zro = 0
-        self.matter = 0
-        self.nanites = 0
-        self.admin = 0
-        self.naval = 0
-        self.jobs = []
+
+
 class OrganicParadise(Building):
     def __init__(self):
-        self.housing = 0
-        self.amenities = 0
+        super().__init__()
+        self.name = "OrganicParadise"
         self.energy = -5
-        self.minerals = 0
-        self.food = 0
-        self.trade = 0
-        self.goods = 0
-        self.alloys = 0
-        self.influence = 0
-        self.unity = 0
-        self.physics = 0
-        self.society = 0
-        self.engineering = 0
-        self.motes = 0
         self.gases = -1
-        self.crystals = 0
-        self.metals = 0
-        self.zro = 0
-        self.matter = 0
-        self.nanites = 0
-        self.admin = 0
-        self.naval = 0
-        self.jobs = []
-        
+
         self.bio_trophies = 1
         self.maintenance_drones = 0
 
         for j in range(self.bio_trophies):
-            self.jobs.append(jobs.BioTrophy)
+            self.jobs_slots.append(jobs.BioTrophy())
         for j in range(self.maintenance_drones):
-            self.jobs.append(jobs.MaintenanceDrone)
+            self.jobs_slots.append(jobs.MaintenanceDrone())
+
+
 class Fortress(Building):
     def __init__(self):
+        super().__init__()
+        self.name = "Fortress"
         self.housing = 3
-        self.amenities = 0
         self.energy = -1
-        self.minerals = 0
-        self.food = 0
-        self.trade = 0
-        self.goods = 0
-        self.alloys = 0
-        self.influence = 0
-        self.unity = 0
-        self.physics = 0
-        self.society = 0
-        self.engineering = 0
         self.motes = -1
-        self.gases = 0
-        self.crystals = 0
-        self.metals = 0
-        self.zro = 0
-        self.matter = 0
-        self.nanites = 0
-        self.admin = 0
-        self.naval = 0
-        self.jobs = []
-        
+
         self.soldiers = 3
         self.warrior_drones = 0
-        
-        if "hive_mind" in modifiers.authority or "machine_intelligence" in modifiers.authority:
+
+        if (
+            "hive_mind" in modifiers.authority
+            or "machine_intelligence" in modifiers.authority
+        ):
             self.soldiers = 0
             self.warrior_drones = 3
 
         for j in range(self.soldiers):
-            self.jobs.append(jobs.Soldier)
+            self.jobs_slots.append(jobs.Soldier())
         for j in range(self.warrior_drones):
-            self.jobs.append(jobs.WarriorDrone)
+            self.jobs_slots.append(jobs.WarriorDrone())
+
+
 class BetharianPowerPlant(Building):
     def __init__(self):
-        self.housing = 0
-        self.amenities = 0
+        super().__init__()
+        self.name = "BetharianPowerPlant"
         self.energy = 10
-        self.minerals = 0
-        self.food = 0
-        self.trade = 0
-        self.goods = 0
-        self.alloys = 0
-        self.influence = 0
-        self.unity = 0
-        self.physics = 0
-        self.society = 0
-        self.engineering = 0
-        self.motes =0
-        self.gases = 0
-        self.crystals = 0
-        self.metals = 0
-        self.zro = 0
-        self.matter = 0
-        self.nanites = 0
-        self.admin = 0
-        self.naval = 0
-        self.jobs = []
-        
+
         self.technicians = 4
         self.tech_drones = 0
-        
-        if "hive_mind" in modifiers.authority or "machine_intelligence" in modifiers.authority:
+
+        if (
+            "hive_mind" in modifiers.authority
+            or "machine_intelligence" in modifiers.authority
+        ):
             self.technicians = 0
             self.tech_drones = 4
 
         for j in range(self.technicians):
-            self.jobs.append(jobs.Technician)
+            self.jobs_slots.append(jobs.Technician())
         for j in range(self.tech_drones):
-            self.jobs.append(jobs.TechDrone)
+            self.jobs_slots.append(jobs.TechDrone())
+
+
 class AlienZoo(Building):
     def __init__(self):
-        self.housing = 0
-        self.amenities = 0
+        super().__init__()
+        self.name = "AlienZoo"
         self.energy = -1
-        self.minerals = 0
-        self.food = 0
-        self.trade = 0
-        self.goods = 0
-        self.alloys = 0
-        self.influence = 0
-        self.unity = 0
-        self.physics = 0
-        self.society = 0
-        self.engineering = 0
-        self.motes =0
-        self.gases = 0
-        self.crystals = 0
-        self.metals = 0
-        self.zro = 0
-        self.matter = 0
-        self.nanites = 0
-        self.admin = 0
-        self.naval = 0
-        self.jobs = []
-        
+
         self.culture_workers = 2
         self.entertainers = 1
         self.duelists = 0
-        
+
         if "warrior_culture" in modifiers.civics:
             self.culture_workers = 2
-            self.entertainers -=1
+            self.entertainers -= 1
             self.duelists = 1
 
         for j in range(self.culture_workers):
-            self.jobs.append(jobs.CultureWorker)
+            self.jobs_slots.append(jobs.CultureWorker())
         for j in range(self.entertainers):
-            self.jobs.append(jobs.Entertainer)
+            self.jobs_slots.append(jobs.Entertainer())
         for j in range(self.duelists):
-            self.jobs.append(jobs.Duelist)
+            self.jobs_slots.append(jobs.Duelist())
+
+
 class CrystalMines(Building):
     def __init__(self):
-        self.housing = 0
-        self.amenities = 0
+        super().__init__()
+        self.name = "CrystalMines"
         self.energy = -1
-        self.minerals = 0
-        self.food = 0
-        self.trade = 0
-        self.goods = 0
-        self.alloys = 0
-        self.influence = 0
-        self.unity = 0
-        self.physics = 0
-        self.society = 0
-        self.engineering = 0
-        self.motes =0
-        self.gases = 0
-        self.crystals = 0
-        self.metals = 0
-        self.zro = 0
-        self.matter = 0
-        self.nanites = 0
-        self.admin = 0
-        self.naval = 0
-        self.jobs = []
-        
+
         self.crystal_miners = 1
         self.crystal_mining_drones = 0
-        
-        if "hive_mind" in modifiers.authority or "machine_intelligence" in modifiers.authority:
+
+        if (
+            "hive_mind" in modifiers.authority
+            or "machine_intelligence" in modifiers.authority
+        ):
             self.crystal_miners = 0
             self.crystal_mining_drones = 1
 
         for j in range(self.crystal_miners):
-            self.jobs.append(jobs.CrystalMiner)
+            self.jobs_slots.append(jobs.CrystalMiner())
         for j in range(self.crystal_mining_drones):
-            self.jobs.append(jobs.CrystalMiningDrone)
+            self.jobs_slots.append(jobs.CrystalMiningDrone())
+
+
 class GasExtractionWells(Building):
     def __init__(self):
-        self.housing = 0
-        self.amenities = 0
+        super().__init__()
+        self.name = "GasExtractionWells"
         self.energy = -1
-        self.minerals = 0
-        self.food = 0
-        self.trade = 0
-        self.goods = 0
-        self.alloys = 0
-        self.influence = 0
-        self.unity = 0
-        self.physics = 0
-        self.society = 0
-        self.engineering = 0
-        self.motes =0
-        self.gases = 0
-        self.crystals = 0
-        self.metals = 0
-        self.zro = 0
-        self.matter = 0
-        self.nanites = 0
-        self.admin = 0
-        self.naval = 0
-        self.jobs = []
-        
+
         self.gas_extractors = 1
         self.gas_extraction_drones = 0
-        
-        if "hive_mind" in modifiers.authority or "machine_intelligence" in modifiers.authority:
+
+        if (
+            "hive_mind" in modifiers.authority
+            or "machine_intelligence" in modifiers.authority
+        ):
             self.gas_extractors = 0
             self.gas_extraction_drones = 1
 
         for j in range(self.gas_extractors):
-            self.jobs.append(jobs.GasExtractor)
+            self.jobs_slots.append(jobs.GasExtractor())
         for j in range(self.gas_extraction_drones):
-            self.jobs.append(jobs.GasExtractionDrone)
+            self.jobs_slots.append(jobs.GasExtractionDrone())
+
+
 class MoteHarvestingTraps(Building):
     def __init__(self):
-        self.housing = 0
-        self.amenities = 0
+        super().__init__()
+        self.name = "MoteHarvestingTraps"
         self.energy = -1
-        self.minerals = 0
-        self.food = 0
-        self.trade = 0
-        self.goods = 0
-        self.alloys = 0
-        self.influence = 0
-        self.unity = 0
-        self.physics = 0
-        self.society = 0
-        self.engineering = 0
-        self.motes =0
-        self.gases = 0
-        self.crystals = 0
-        self.metals = 0
-        self.zro = 0
-        self.matter = 0
-        self.nanites = 0
-        self.admin = 0
-        self.naval = 0
-        self.jobs = []
-        
+
         self.mote_harvesters = 1
         self.mote_harvesting_drones = 0
-        
-        if "hive_mind" in modifiers.authority or "machine_intelligence" in modifiers.authority:
+        if (
+            "hive_mind" in modifiers.authority
+            or "machine_intelligence" in modifiers.authority
+        ):
             self.mote_harvesters = 0
             self.mote_harvesting_drones = 1
 
         for j in range(self.mote_harvesters):
-            self.jobs.append(jobs.MoteHarvester)
+            self.jobs_slots.append(jobs.MoteHarvester())
         for j in range(self.mote_harvesting_drones):
-            self.jobs.append(jobs.MoteHarvestingDrone)
+            self.jobs_slots.append(jobs.MoteHarvestingDrone())
+
+
 class ResourceSilos(Building):
     def __init__(self):
-        self.housing = 0
-        self.amenities = 0
+        super().__init__()
+        self.name = "ResourceSilos"
         self.energy = -1
-        self.minerals = 0
-        self.food = 0
-        self.trade = 0
-        self.goods = 0
-        self.alloys = 0
-        self.influence = 0
-        self.unity = 0
-        self.physics = 0
-        self.society = 0
-        self.engineering = 0
-        self.motes =0
-        self.gases = 0
-        self.crystals = 0
-        self.metals = 0
-        self.zro = 0
-        self.matter = 0
-        self.nanites = 0
-        self.admin = 0
-        self.naval = 0
-        self.jobs = []
-        
+
         self.clerks = 2
         self.maintenance_drones = 0
-        
+
         if "gestalt_consciousness" in modifiers.ethics:
             self.clerks = 0
             self.maintenance_drones = 1
 
         for j in range(self.clerks):
-            self.jobs.append(jobs.Clerk)
+            self.jobs_slots.append(jobs.Clerk())
         for j in range(self.maintenance_drones):
-            self.jobs.append(jobs.MaintenanceDrone)
+            self.jobs_slots.append(jobs.MaintenanceDrone())
+
+
 class BioReactor(Building):
     def __init__(self):
-        self.housing = 0
-        self.amenities = 0
+        super().__init__()
+        self.name = "BioReactor"
         self.energy = 20
-        self.minerals = 0
         self.food = -25
-        self.trade = 0
-        self.goods = 0
-        self.alloys = 0
-        self.influence = 0
-        self.unity = 0
-        self.physics = 0
-        self.society = 0
-        self.engineering = 0
-        self.motes =0
-        self.gases = 0
-        self.crystals = 0
-        self.metals = 0
-        self.zro = 0
-        self.matter = 0
-        self.nanites = 0
-        self.admin = 0
-        self.naval = 0
-        self.jobs = []
-class NaniteTransmuter(Building):
-    def __init__(self):
-        self.housing = 0
-        self.amenities = 0
-        self.energy = -5
-        self.minerals = 0
-        self.food =0
-        self.trade = 0
-        self.goods = 0
-        self.alloys = 0
-        self.influence = 0
-        self.unity = 0
-        self.physics = 0
-        self.society = 0
-        self.engineering = 0
-        self.motes =2
-        self.gases = 2
-        self.crystals = 2
-        self.metals = 0
-        self.zro = 0
-        self.matter = 0
-        self.nanites = -1
-        self.admin = 0
-        self.naval = 0
-        self.jobs = []
+
+
+# class NaniteTransmuter(Building):
+#     def __init__(self):
+#         super().__init__()
+# self.name = "NaniteTransmuter"
+#         self.energy = -5
+#         self.food = 0
+#         self.motes = 2
+#         self.gases = 2
+#         self.crystals = 2
+#         self.nanites = -1
+
+
 class SlaveHuts(Building):
     def __init__(self):
+        super().__init__()
+        self.name = "SlaveHuts"
         self.housing = 8
-        self.amenities = 0
         self.energy = -1
-        self.minerals = 0
-        self.food =0
-        self.trade = 0
-        self.goods = 0
-        self.alloys = 0
-        self.influence = 0
-        self.unity = 0
-        self.physics = 0
-        self.society = 0
-        self.engineering = 0
-        self.motes =0
-        self.gases = 0
-        self.crystals = 0
-        self.metals = 0
-        self.zro = 0
-        self.matter = 0
-        self.nanites = 0
-        self.admin = 0
-        self.naval = 0
-        self.jobs = []
+        self.food = 0
+
+
 class OverseerResidences(Building):
     def __init__(self):
+        super().__init__()
+        self.name = "OverseerResidences"
         self.housing = 2
-        self.amenities = 0
         self.energy = -1
-        self.minerals = 0
-        self.food =0
-        self.trade = 0
-        self.goods = 0
-        self.alloys = 0
-        self.influence = 0
-        self.unity = 0
-        self.physics = 0
-        self.society = 0
-        self.engineering = 0
-        self.motes =0
-        self.gases = 0
-        self.crystals = 0
-        self.metals = 0
-        self.zro = 0
-        self.matter = 0
-        self.nanites = 0
-        self.admin = 0
-        self.naval = 0
-        self.jobs = []
+        self.food = 0
 
         self.slave_overseers = 2
-
         for j in range(self.slave_overseers):
-            self.jobs.append(jobs.SlaveOverseer)
+            self.jobs_slots.append(jobs.SlaveOverseer())
+
+
 class UniqueBuilding(Building):
     def __init__(self):
-        self.housing = 0
-        self.amenities = 0
-        self.energy = 0
-        self.minerals = 0
-        self.food = 0
-        self.trade = 0
-        self.goods = 0
-        self.alloys = 0
-        self.influence = 0
-        self.unity = 0
-        self.physics = 0
-        self.society = 0
-        self.engineering = 0
-        self.motes = 0
-        self.gases = 0
-        self.crystals = 0
-        self.metals = 0
-        self.zro = 0
-        self.matter = 0
-        self.nanites = 0
-        self.admin = 0
-        self.naval = 0
-        self.jobs = []
+        super().__init__()
+
+
 class PlanetaryShieldGenerator(UniqueBuilding):
     def __init__(self):
-        self.housing = 0
-        self.amenities = 0
+        super().__init__()
+        self.name = "PlanetaryShieldGenerator"
         self.energy = -5
-        self.minerals = 0
-        self.food = 0
-        self.trade = 0
-        self.goods = 0
-        self.alloys = 0
-        self.influence = 0
-        self.unity = 0
-        self.physics = 0
-        self.society = 0
-        self.engineering = 0
-        self.motes = 0
-        self.gases = 0
-        self.crystals = 0
-        self.metals = 0
-        self.zro = 0
-        self.matter = 0
-        self.nanites = 0
-        self.admin = 0
-        self.naval = 0
-        self.jobs = []
+
+
 class MilitaryAcademy(UniqueBuilding):
     def __init__(self):
-        self.housing = 0
-        self.amenities = 0
+        super().__init__()
+        self.name = "MilitaryAcademy"
         self.energy = -2
-        self.minerals = 0
-        self.food = 0
-        self.trade = 0
-        self.goods = 0
-        self.alloys = 0
-        self.influence = 0
-        self.unity = 0
-        self.physics = 0
-        self.society = 0
-        self.engineering = 0
-        self.motes = 0
-        self.gases = 0
-        self.crystals = 0
-        self.metals = 0
-        self.zro = 0
-        self.matter = 0
-        self.nanites = 0
-        self.admin = 0
-        self.naval = 0
-        self.jobs = []
 
         self.soldiers = 1
         self.warrior_drones = 0
-
-        if "hive_mind" in modifiers.authority or "machine_intelligence" in modifiers.authority:
+        if (
+            "hive_mind" in modifiers.authority
+            or "machine_intelligence" in modifiers.authority
+        ):
             self.soldiers = 0
             self.warrior_drones = 1
 
         for c in range(self.soldiers):
-            self.jobs.append(jobs.Soldier )
+            self.jobs_slots.append(jobs.Soldier())
         for c in range(self.warrior_drones):
-            self.jobs.append(jobs.WarriorDrones)
+            self.jobs_slots.append(jobs.WarriorDrone())
+
+
 class EnergyNexus(UniqueBuilding):
     def __init__(self):
-        self.housing = 0
-        self.amenities = 0
+        super().__init__()
+        self.name = "EnergyNexus"
         self.energy = -2
-        self.minerals = 0
-        self.food = 0
-        self.trade = 0
-        self.goods = 0
-        self.alloys = 0
-        self.influence = 0
-        self.unity = 0
-        self.physics = 0
-        self.society = 0
-        self.engineering = 0
-        self.motes = 0
         self.gases = -1
-        self.crystals = 0
-        self.metals = 0
-        self.zro = 0
-        self.matter = 0
-        self.nanites = 0
-        self.admin = 0
-        self.naval = 0
-        self.jobs = []
 
         self.technicians = 2
         self.tech_drones = 0
-
-        if "hive_mind" in modifiers.authority or "machine_intelligence" in modifiers.authority:
+        if (
+            "hive_mind" in modifiers.authority
+            or "machine_intelligence" in modifiers.authority
+        ):
             self.technicians = 0
             self.tech_drones = 2
 
         for j in range(self.technicians):
-            self.jobs.append(jobs.Technician)
-        for j in range(self.warrior_drones):
-            self.jobs.append(jobs.TechDrone)
+            self.jobs_slots.append(jobs.Technician())
+        for j in range(self.tech_drones):
+            self.jobs_slots.append(jobs.TechDrone())
+
+
 class MineralPurificationHubs(UniqueBuilding):
     def __init__(self):
-        self.housing = 0
-        self.amenities = 0
+        super().__init__()
+        self.name = "MineralPurificationHubs"
         self.energy = -2
-        self.minerals = 0
-        self.food = 0
-        self.trade = 0
-        self.goods = 0
-        self.alloys = 0
-        self.influence = 0
-        self.unity = 0
-        self.physics = 0
-        self.society = 0
-        self.engineering = 0
         self.motes = -1
-        self.gases = 0
-        self.crystals = 0
-        self.metals = 0
-        self.zro = 0
-        self.matter = 0
-        self.nanites = 0
-        self.admin = 0
-        self.naval = 0
-        self.jobs = []
 
         self.miners = 2
         self.mining_drones = 0
-
-        if "hive_mind" in modifiers.authority or "machine_intelligence" in modifiers.authority:
+        if (
+            "hive_mind" in modifiers.authority
+            or "machine_intelligence" in modifiers.authority
+        ):
             self.miners = 0
             self.mining_drones = 2
 
         for j in range(self.miners):
-            self.jobs.append(jobs.Miner)
-        for j in range(self.warrior_drones):
-            self.jobs.append(jobs.WarriorDrone)
+            self.jobs_slots.append(jobs.Miner())
+        for j in range(self.mining_drones):
+            self.jobs_slots.append(jobs.MiningDrone())
+
+
 class FoodProcessingCenters(UniqueBuilding):
     def __init__(self):
-        self.housing = 0
-        self.amenities = 0
+        super().__init__()
+        self.name = "FoodProcessingCenters"
         self.energy = -2
-        self.minerals = 0
-        self.food = 0
-        self.trade = 0
-        self.goods = 0
-        self.alloys = 0
-        self.influence = 0
-        self.unity = 0
-        self.physics = 0
-        self.society = 0
-        self.engineering = 0
         self.motes = -1
-        self.gases = 0
-        self.crystals = 0
-        self.metals = 0
-        self.zro = 0
-        self.matter = 0
-        self.nanites = 0
-        self.admin = 0
-        self.naval = 0
-        self.jobs = []
 
         self.farmers = 2
         self.agri_drones = 0
-
-        if "hive_mind" in modifiers.authority or "machine_intelligence" in modifiers.authority:
+        if (
+            "hive_mind" in modifiers.authority
+            or "machine_intelligence" in modifiers.authority
+        ):
             self.farmers = 0
             self.agri_drones = 2
 
         for j in range(self.farmers):
-            self.jobs.append(jobs.Farmer)
+            self.jobs_slots.append(jobs.Farmer())
         for j in range(self.agri_drones):
-            self.jobs.append(jobs.AgriDrone)
+            self.jobs_slots.append(jobs.AgriDrone())
+
+
 class AutoCuratingVault(UniqueBuilding):
     def __init__(self):
-        self.housing = 0
-        self.amenities = 0
+        super().__init__()
+        self.name = "AutoCuratingVault"
         self.energy = -5
-        self.minerals = 0
-        self.food = 0
-        self.trade = 0
-        self.goods = 0
-        self.alloys = 0
-        self.influence = 0
-        self.unity = 0
-        self.physics = 0
-        self.society = 0
-        self.engineering = 0
-        self.motes = 0
-        self.gases = 0
         self.crystals = -1
-        self.metals = 0
-        self.zro = 0
-        self.matter = 0
-        self.nanites = 0
-        self.admin = 0
-        self.naval = 0
-        self.jobs = []
+
+
 class CitadelOfFaith(UniqueBuilding):
     def __init__(self):
-        self.housing = 0
-        self.amenities = 0
+        super().__init__()
+        self.name = "CitadelOfFaith"
         self.energy = -5
-        self.minerals = 0
-        self.food = 0
-        self.trade = 0
-        self.goods = 0
-        self.alloys = 0
-        self.influence = 0
-        self.unity = 0
-        self.physics = 0
-        self.society = 0
-        self.engineering = 0
-        self.motes = 0
-        self.gases = 0
         self.crystals = -1
-        self.metals = 0
-        self.zro = 0
-        self.matter = 0
-        self.nanites = 0
-        self.admin = 0
-        self.naval = 0
-        self.jobs = []
 
         self.priests = 5
         self.high_priests = 1
-
         for j in range(self.priests):
-            self.jobs.append(jobs.Priest)
+            self.jobs_slots.append(jobs.Priest())
         for j in range(self.high_priests):
-            self.jobs.append(jobs.HighPriest)
+            self.jobs_slots.append(jobs.HighPriest())
+
+
 class VaultOfAcquisitions(UniqueBuilding):
     def __init__(self):
-        self.housing = 0
-        self.amenities = 0
+        super().__init__()
+        self.name = "VaultOfAcquisitions"
         self.energy = -5
-        self.minerals = 0
-        self.food = 0
-        self.trade = 0
-        self.goods = 0
-        self.alloys = 0
-        self.influence = 0
-        self.unity = 0
-        self.physics = 0
-        self.society = 0
-        self.engineering = 0
-        self.motes = 0
-        self.gases = 0
         self.crystals = -1
-        self.metals = 0
-        self.zro = 0
-        self.matter = 0
-        self.nanites = 0
-        self.admin = 0
-        self.naval = 0
-        self.jobs = []
+
+
 class AlphaHub(UniqueBuilding):
     def __init__(self):
-        self.housing = 0
-        self.amenities = 0
+        super().__init__()
+        self.name = "AlphaHub"
         self.energy = -5
-        self.minerals = 0
-        self.food = 0
-        self.trade = 0
-        self.goods = 0
-        self.alloys = 0
-        self.influence = 0
-        self.unity = 0
-        self.physics = 0
-        self.society = 0
-        self.engineering = 0
-        self.motes = 0
-        self.gases = 0
         self.crystals = -1
-        self.metals = 0
-        self.zro = 0
-        self.matter = 0
-        self.nanites = 0
-        self.admin = 0
-        self.naval = 0
-        self.jobs = []
+
+
 class ResearchInstitute(UniqueBuilding):
     def __init__(self):
-        self.housing = 0
-        self.amenities = 0
+        super().__init__()
+        self.name = "ResearchInstitute"
         self.energy = -5
-        self.minerals = 0
-        self.food = 0
-        self.trade = 0
-        self.goods = 0
-        self.alloys = 0
-        self.influence = 0
-        self.unity = 0
-        self.physics = 0
-        self.society = 0
-        self.engineering = 0
-        self.motes = 0
         self.gases = -1
-        self.crystals = 0
-        self.metals = 0
-        self.zro = 0
-        self.matter = 0
-        self.nanites = 0
-        self.admin = 0
-        self.naval = 0
-        self.jobs = []
 
         self.science_directors = 1
-
         for j in range(self.science_directors):
-            self.jobs.append(jobs.ScienceDirector)
+            self.jobs_slots.append(jobs.ScienceDirector())
+
+
 class PlanetarySupercomputer(UniqueBuilding):
     def __init__(self):
-        self.housing = 0
-        self.amenities = 0
+        super().__init__()
+        self.name = "PlanetarySupercomputer"
         self.energy = -5
-        self.minerals = 0
-        self.food = 0
-        self.trade = 0
-        self.goods = 0
-        self.alloys = 0
-        self.influence = 0
-        self.unity = 0
-        self.physics = 0
-        self.society = 0
-        self.engineering = 0
-        self.motes = 0
         self.gases = -1
-        self.crystals = 0
-        self.metals = 0
-        self.zro = 0
-        self.matter = 0
-        self.nanites = 0
-        self.admin = 0
-        self.naval = 0
-        self.jobs = []
 
         self.science_directors = 1
         self.brain_drones = 0
         self.calculators = 0
-
         if "hive_mind" in modifiers.authority:
             self.science_directors = 0
             self.brain_drones = 1
@@ -1615,70 +843,34 @@ class PlanetarySupercomputer(UniqueBuilding):
             self.calculators = 1
 
         for j in range(self.science_directors):
-            self.jobs.append(jobs.ScienceDirector)
+            self.jobs_slots.append(jobs.ScienceDirector())
         for j in range(self.brain_drones):
-            self.jobs.append(jobs.BrainDrone)
+            self.jobs_slots.append(jobs.BrainDrone())
         for j in range(self.calculators):
-            self.jobs.append(jobs.Calculator)
+            self.jobs_slots.append(jobs.Calculator())
+
+
 class MinistryOfProduction(UniqueBuilding):
     def __init__(self):
-        self.housing = 0
-        self.amenities = 0
+        super().__init__()
+        self.name = "MinistryOfProduction"
         self.energy = -5
-        self.minerals = 0
-        self.food = 0
-        self.trade = 0
-        self.goods = 0
-        self.alloys = 0
-        self.influence = 0
-        self.unity = 0
-        self.physics = 0
-        self.society = 0
-        self.engineering = 0
         self.motes = -1
-        self.gases = 0
-        self.crystals = 0
-        self.metals = 0
-        self.zro = 0
-        self.matter = 0
-        self.nanites = 0
-        self.admin = 0
-        self.naval = 0
-        self.jobs = []
 
         self.administrators = 1
-
         for j in range(self.administrators):
-            self.jobs.append(jobs.Administrator)
+            self.jobs_slots.append(jobs.Administrator())
+
+
 class ResourceProcessingCenter(UniqueBuilding):
     def __init__(self):
-        self.housing = 0
-        self.amenities = 0
+        super().__init__()
+        self.name = "ResourceProcessingCenter"
         self.energy = -5
-        self.minerals = 0
-        self.food = 0
-        self.trade = 0
-        self.goods = 0
-        self.alloys = 0
-        self.influence = 0
-        self.unity = 0
-        self.physics = 0
-        self.society = 0
-        self.engineering = 0
         self.motes = -1
-        self.gases = 0
-        self.crystals = 0
-        self.metals = 0
-        self.zro = 0
-        self.matter = 0
-        self.nanites = 0
-        self.admin = 0
-        self.naval = 0
-        self.jobs = []
 
         self.foundry_drones = 2
         self.fabricators = 0
-
         if "hive_mind" in modifiers.authority:
             self.foundry_drones = 2
             self.fabricators = 0
@@ -1687,341 +879,122 @@ class ResourceProcessingCenter(UniqueBuilding):
             self.fabricators = 1
 
         for j in range(self.foundry_drones):
-            self.jobs.append(jobs.FoundryDrone)
+            self.jobs_slots.append(jobs.FoundryDrone())
         for j in range(self.fabricators):
-            self.jobs.append(jobs.Fabricator)
+            self.jobs_slots.append(jobs.Fabricator())
+
+
 class CytoRevitalizationCenter(UniqueBuilding):
     def __init__(self):
-        self.housing = 0
-        self.amenities = 0
+        super().__init__()
+        self.name = "CytoRevitalizationCenter"
         self.energy = -5
-        self.minerals = 0
-        self.food = 0
-        self.trade = 0
-        self.goods = 0
-        self.alloys = 0
-        self.influence = 0
-        self.unity = 0
-        self.physics = 0
-        self.society = 0
-        self.engineering = 0
-        self.motes = 0
         self.gases = -1
-        self.crystals = 0
-        self.metals = 0
-        self.zro = 0
-        self.matter = 0
-        self.nanites = 0
-        self.admin = 0
-        self.naval = 0
-        self.jobs = []
 
         self.medical_workers = 5
-
         for j in range(self.medical_workers):
-            self.jobs.append(jobs.MedicalWorker)
+            self.jobs_slots.append(jobs.MedicalWorker())
+
+
 class SpawningPools(UniqueBuilding):
     def __init__(self):
-        self.housing = 0
-        self.amenities = 0
+        super().__init__()
+        self.name = "SpawningPools"
         self.energy = -2
-        self.minerals = 0
-        self.food = 0
-        self.trade = 0
-        self.goods = 0
-        self.alloys = 0
-        self.influence = 0
-        self.unity = 0
-        self.physics = 0
-        self.society = 0
-        self.engineering = 0
-        self.motes = 0
-        self.gases = 0
-        self.crystals = 0
-        self.metals = 0
-        self.zro = 0
-        self.matter = 0
-        self.nanites = 0
-        self.admin = 0
-        self.naval = 0
-        self.jobs = []
 
         self.spawning_drones = 1
-
         for j in range(self.spawning_drones):
-            self.jobs.append(jobs.SpawningDrone)
+            self.jobs_slots.append(jobs.SpawningDrone())
+
+
 class RobotAssemblyPlants(UniqueBuilding):
     def __init__(self):
-        self.housing = 0
-        self.amenities = 0
+        super().__init__()
+        self.name = "RobotAssemblyPlants"
         self.energy = -5
-        self.minerals = 0
-        self.food = 0
-        self.trade = 0
-        self.goods = 0
-        self.alloys = 0
-        self.influence = 0
-        self.unity = 0
-        self.physics = 0
-        self.society = 0
-        self.engineering = 0
-        self.motes = 0
-        self.gases = 0
-        self.crystals = 0
-        self.metals = 0
-        self.zro = 0
-        self.matter = 0
-        self.nanites = 0
-        self.admin = 0
-        self.naval = 0
-        self.jobs = []
 
         self.roboticists = 1
-
         for j in range(self.roboticists):
-            self.jobs.append(jobs.Roboticist)
+            self.jobs_slots.append(jobs.Roboticist())
+
+
 class MachineAssemblyComplex(UniqueBuilding):
     def __init__(self):
-        self.housing = 0
-        self.amenities = 0
+        super().__init__()
+        self.name = "MachineAssemblyComplex"
         self.energy = -8
-        self.minerals = 0
-        self.food = 0
-        self.trade = 0
-        self.goods = 0
-        self.alloys = 0
-        self.influence = 0
-        self.unity = 0
-        self.physics = 0
-        self.society = 0
-        self.engineering = 0
-        self.motes = 0
-        self.gases = 0
         self.crystals = -2
-        self.metals = 0
-        self.zro = 0
-        self.matter = 0
-        self.nanites = 0
-        self.admin = 0
-        self.naval = 0
-        self.jobs = []
 
         self.replicators = 3
-
         for j in range(self.replicators):
-            self.jobs.append(jobs.Replicator)
+            self.jobs_slots.append(jobs.Replicator())
+
+
 class GalacticStockExchange(UniqueBuilding):
     def __init__(self):
-        self.housing = 0
-        self.amenities = 0
+        super().__init__()
+        self.name = "GalacticStockExchange"
         self.energy = -5
-        self.minerals = 0
-        self.food = 0
-        self.trade = 0
-        self.goods = 0
-        self.alloys = 0
-        self.influence = 0
-        self.unity = 0
-        self.physics = 0
-        self.society = 0
-        self.engineering = 0
-        self.motes = 0
-        self.gases = 0
         self.crystals = -1
-        self.metals = 0
-        self.zro = 0
-        self.matter = 0
-        self.nanites = 0
-        self.admin = 0
-        self.naval = 0
-        self.jobs = []
 
         self.merchants = 2
-
         for j in range(self.merchants):
-            self.jobs.append(jobs.Merchant)
+            self.jobs_slots.append(jobs.Merchant())
+
+
 class NobleEstates(UniqueBuilding):
     def __init__(self):
-        self.housing = 0
-        self.amenities = 0
+        super().__init__()
+        self.name = "NobleEstates"
         self.energy = -2
-        self.minerals = 0
-        self.food = 0
-        self.trade = 0
-        self.goods = 0
-        self.alloys = 0
-        self.influence = 0
-        self.unity = 0
-        self.physics = 0
-        self.society = 0
-        self.engineering = 0
-        self.motes = 0
-        self.gases = 0
-        self.crystals = 0
-        self.metals = 0
-        self.zro = 0
-        self.matter = 0
-        self.nanites = 0
-        self.admin = 0
-        self.naval = 0
-        self.jobs = []
 
         self.nobles = 1
-
         for j in range(self.nobles):
-            self.jobs.append(jobs.Noble)
+            self.jobs_slots.append(jobs.Noble())
+
+
 class SlaveProcessingFacility(UniqueBuilding):
     def __init__(self):
-        self.housing = 0
-        self.amenities = 0
+        super().__init__()
+        self.name = "SlaveProcessingFacility"
         self.energy = -2
-        self.minerals = 0
-        self.food = 0
-        self.trade = 0
-        self.goods = 0
-        self.alloys = 0
-        self.influence = 0
-        self.unity = 0
-        self.physics = 0
-        self.society = 0
-        self.engineering = 0
-        self.motes = 0
-        self.gases = 0
-        self.crystals = 0
-        self.metals = 0
-        self.zro = 0
-        self.matter = 0
-        self.nanites = 0
-        self.admin = 0
-        self.naval = 0
-        self.jobs = []
+
+
 class CloneVats(UniqueBuilding):
     def __init__(self):
-        self.housing = 0
-        self.amenities = 0
+        super().__init__()
+        self.name = "CloneVats"
         self.energy = -2
-        self.minerals = 0
-        self.food = 0
-        self.trade = 0
-        self.goods = 0
-        self.alloys = 0
-        self.influence = 0
-        self.unity = 0
-        self.physics = 0
-        self.society = 0
-        self.engineering = 0
-        self.motes = 0
-        self.gases = 0
-        self.crystals = 0
-        self.metals = 0
-        self.zro = 0
-        self.matter = 0
-        self.nanites = 0
-        self.admin = 0
-        self.naval = 0
-        self.jobs = []
+
+
 class PsiCorps(UniqueBuilding):
     def __init__(self):
-        self.housing = 0
-        self.amenities = 0
+        super().__init__()
+        self.name = "PsiCorps"
         self.energy = -5
-        self.minerals = 0
-        self.food = 0
-        self.trade = 0
-        self.goods = 0
-        self.alloys = 0
-        self.influence = 0
-        self.unity = 0
-        self.physics = 0
-        self.society = 0
-        self.engineering = 0
-        self.motes = 0
-        self.gases = 0
-        self.crystals = 0
-        self.metals = 0
-        self.zro = 0
-        self.matter = 0
-        self.nanites = 0
-        self.admin = 0
-        self.naval = 0
-        self.jobs = []
 
         self.telepaths = 2
-
         for j in range(self.telepaths):
-            self.jobs.append(jobs.Telepath)
+            self.jobs_slots.append(jobs.Telepath())
+
+
 class EmpireUniqueBuilding(Building):
     def __init__(self):
-        self.housing = 0
-        self.amenities = 0
-        self.energy = 0
-        self.minerals = 0
-        self.food = 0
-        self.trade = 0
-        self.goods = 0
-        self.alloys = 0
-        self.influence = 0
-        self.unity = 0
-        self.physics = 0
-        self.society = 0
-        self.engineering = 0
-        self.motes = 0
-        self.gases = 0
-        self.crystals = 0
-        self.metals = 0
-        self.zro = 0
-        self.matter = 0
-        self.nanites = 0
-        self.admin = 0
-        self.naval = 0
-        self.jobs = []
+        super().__init__()
+        self.jobs_slots = []
+
+
 class GrandEmbassyComplex(EmpireUniqueBuilding):
     def __init__(self):
-        self.housing = 0
-        self.amenities = 0
+        super().__init__()
+        self.name = "GrandEmbassyComplex"
         self.energy = -8
-        self.minerals = 0
-        self.food = 0
-        self.trade = 0
-        self.goods = 0
-        self.alloys = 0
-        self.influence = 0
-        self.unity = 0
-        self.physics = 0
-        self.society = 0
-        self.engineering = 0
-        self.motes = 0
-        self.gases = 0
         self.crystals = -2
-        self.metals = 0
-        self.zro = 0
-        self.matter = 0
-        self.nanites = 0
-        self.admin = 0
-        self.naval = 0
-        self.jobs = []
+
+
 class OmegaAlignment(EmpireUniqueBuilding):
     def __init__(self):
-        self.housing = 0
-        self.amenities = 0
+        super().__init__()
+        self.name = "OmegaAlignment"
         self.energy = -8
-        self.minerals = 0
-        self.food = 0
-        self.trade = 0
-        self.goods = 0
-        self.alloys = 0
-        self.influence = 0
-        self.unity = 0
         self.physics = 16
-        self.society = 0
-        self.engineering = 0
-        self.motes = 0
-        self.gases = 0
-        self.crystals = 0
-        self.metals = 0
-        self.zro = 0
-        self.matter = 0
-        self.nanites = 0
-        self.admin = 0
-        self.naval = 0
-        self.jobs = []
