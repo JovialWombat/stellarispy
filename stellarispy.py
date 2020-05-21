@@ -49,8 +49,9 @@ def export_data(data, filename):
 # def instantiate_all_subclasses(classes):
 #     return [obj() for obj in classes]
 
+empire_name="unoe"
 
-with open("data.json") as f:
+with open("input/{0}.json".format(empire_name)) as f:
     data = json.load(f)
 
     # create planets from input data
@@ -155,7 +156,7 @@ with open("data.json") as f:
     final_production = helpers.aggregate_production(
         helpers.complete_planet_builds, None
     )
-    export_data(final_production, "final_production")
+    export_data(final_production, "{0}-production".format(empire_name))
 
     final_errors = {
         key: value / helpers.resource_relative_values[key]
@@ -165,11 +166,11 @@ with open("data.json") as f:
             final_production,
         ).items()
     }
-    export_data(final_errors, "final_errors")
+    export_data(final_errors, "{0}-errors".format(empire_name))
 
     builds_to_export= []
     for b in helpers.complete_planet_builds:
         b.prepare_for_export()
         to_export = {k:v for (k,v) in b.__dict__.items() if re.match(r"\_.*", k)}
         builds_to_export.append(to_export)
-    export_data(builds_to_export, "complete_planet_builds")
+    export_data(builds_to_export, "{0}-planets".format(empire_name))
