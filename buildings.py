@@ -26,29 +26,148 @@ class Building(object):
 
     def aggregate_resources(self):
         return {
-            "housing": self.housing + sum(j.housing for j in self.jobs_slots),
-            "amenities": self.amenities + sum(j.amenities for j in self.jobs_slots),
-            "energy": self.energy + sum(j.energy for j in self.jobs_slots),
-            "minerals": self.minerals + sum(j.minerals for j in self.jobs_slots),
-            "food": self.food + sum(j.food for j in self.jobs_slots),
-            "trade": self.trade + sum(j.trade for j in self.jobs_slots),
-            "goods": self.goods + sum(j.goods for j in self.jobs_slots),
-            "alloys": self.alloys + sum(j.alloys for j in self.jobs_slots),
-            "unity": self.unity + sum(j.unity for j in self.jobs_slots),
+            "housing": self.housing
+            + sum(
+                (j.production["housing"] * j.production_coefficients["housing"])
+                + j.production_constants["housing"]
+                + (j.upkeep["housing"] * j.upkeep_coefficients["housing"])
+                + j.upkeep_constants["housing"]
+                for j in self.jobs_slots
+            ),
+            "amenities": self.amenities
+            + sum(
+                (j.production["amenities"] * j.production_coefficients["amenities"])
+                + j.production_constants["amenities"]
+                + (j.upkeep["amenities"] * j.upkeep_coefficients["amenities"])
+                + j.upkeep_constants["amenities"]
+                for j in self.jobs_slots
+            ),
+            "energy": self.energy
+            + sum(
+                (j.production["energy"] * j.production_coefficients["energy"])
+                + j.production_constants["energy"]
+                + (j.upkeep["energy"] * j.upkeep_coefficients["energy"])
+                + j.upkeep_constants["energy"]
+                for j in self.jobs_slots
+            ),
+            "minerals": self.minerals
+            + sum(
+                (j.production["minerals"] * j.production_coefficients["minerals"])
+                + j.production_constants["minerals"]
+                + (j.upkeep["minerals"] * j.upkeep_coefficients["minerals"])
+                + j.upkeep_constants["minerals"]
+                for j in self.jobs_slots
+            ),
+            "food": self.food
+            + sum(
+                (j.production["food"] * j.production_coefficients["food"])
+                + j.production_constants["food"]
+                + (j.upkeep["food"] * j.upkeep_coefficients["food"])
+                + j.upkeep_constants["food"]
+                for j in self.jobs_slots
+            ),
+            "trade": self.trade
+            + sum(
+                (j.production["trade"] * j.production_coefficients["trade"])
+                + j.production_constants["trade"]
+                + (j.upkeep["trade"] * j.upkeep_coefficients["trade"])
+                + j.upkeep_constants["trade"]
+                for j in self.jobs_slots
+            ),
+            "goods": self.goods
+            + sum(
+                (j.production["goods"] * j.production_coefficients["goods"])
+                + j.production_constants["goods"]
+                + (j.upkeep["goods"] * j.upkeep_coefficients["goods"])
+                + j.upkeep_constants["goods"]
+                for j in self.jobs_slots
+            ),
+            "alloys": self.alloys
+            + sum(
+                (j.production["alloys"] * j.production_coefficients["alloys"])
+                + j.production_constants["alloys"]
+                + (j.upkeep["alloys"] * j.upkeep_coefficients["alloys"])
+                + j.upkeep_constants["alloys"]
+                for j in self.jobs_slots
+            ),
+            "unity": self.unity
+            + sum(
+                (j.production["unity"] * j.production_coefficients["unity"])
+                + j.production_constants["unity"]
+                + (j.upkeep["unity"] * j.upkeep_coefficients["unity"])
+                + j.upkeep_constants["unity"]
+                for j in self.jobs_slots
+            ),
             "research": (
                 self.physics
-                + sum(j.physics for j in self.jobs_slots)
-                + self.society
-                + sum(j.society for j in self.jobs_slots)
-                + self.engineering
-                + sum(j.engineering for j in self.jobs_slots)
+                + sum(
+                    (j.production["physics"] * j.production_coefficients["physics"])
+                    + j.production_constants["physics"]
+                    + (j.upkeep["physics"] * j.upkeep_coefficients["physics"])
+                    + j.upkeep_constants["physics"]
+                    for j in self.jobs_slots
+                )+
+                self.society
+                + sum(
+                    (j.production["society"] * j.production_coefficients["society"])
+                    + j.production_constants["society"]
+                    + (j.upkeep["society"] * j.upkeep_coefficients["society"])
+                    + j.upkeep_constants["society"]
+                    for j in self.jobs_slots
+                )+
+                self.engineering
+                + sum(
+                    (
+                        j.production["engineering"]
+                        * j.production_coefficients["engineering"]
+                    )
+                    + j.production_constants["engineering"]
+                    + (j.upkeep["engineering"] * j.upkeep_coefficients["engineering"])
+                    + j.upkeep_constants["engineering"]
+                    for j in self.jobs_slots
+                )
             )
             / 3,
-            "motes": self.motes + sum(j.motes for j in self.jobs_slots),
-            "gases": self.gases + sum(j.gases for j in self.jobs_slots),
-            "crystals": self.crystals + sum(j.crystals for j in self.jobs_slots),
-            "admin": self.admin + sum(j.admin for j in self.jobs_slots),
-            "naval": self.naval + sum(j.naval for j in self.jobs_slots),
+            "motes": self.motes
+            + sum(
+                (j.production["motes"] * j.production_coefficients["motes"])
+                + j.production_constants["motes"]
+                + (j.upkeep["motes"] * j.upkeep_coefficients["motes"])
+                + j.upkeep_constants["motes"]
+                for j in self.jobs_slots
+            ),
+            "gases": self.gases
+            + sum(
+                (j.production["gases"] * j.production_coefficients["gases"])
+                + j.production_constants["gases"]
+                + (j.upkeep["gases"] * j.upkeep_coefficients["gases"])
+                + j.upkeep_constants["gases"]
+                for j in self.jobs_slots
+            ),
+            "crystals": self.crystals
+            + sum(
+                (j.production["crystals"] * j.production_coefficients["crystals"])
+                + j.production_constants["crystals"]
+                + (j.upkeep["crystals"] * j.upkeep_coefficients["crystals"])
+                + j.upkeep_constants["crystals"]
+                for j in self.jobs_slots
+            ),
+            "admin": self.admin
+            + sum(
+                (j.production["admin"] * j.production_coefficients["admin"])
+                + j.production_constants["admin"]
+                + (j.upkeep["admin"] * j.upkeep_coefficients["admin"])
+                + j.upkeep_constants["admin"]
+                for j in self.jobs_slots
+            ),
+            "naval": self.naval
+            + sum(
+                (j.production["naval"] * j.production_coefficients["naval"])
+                + j.production_constants["naval"]
+                + (j.upkeep["naval"] * j.upkeep_coefficients["naval"])
+                + j.upkeep_constants["naval"]
+                for j in self.jobs_slots
+            ),
             "jobs": len(self.jobs_slots),
         }
 
