@@ -21,6 +21,7 @@ class Job(object):
             "crystals": 0,
             "admin": 0,
             "naval": 0,
+            "storage": 0,
             "jobs": 0,
         }
         self.upkeep = {
@@ -41,6 +42,7 @@ class Job(object):
             "crystals": 0,
             "admin": -0.5,
             "naval": 0,
+            "storage": 0,
             "jobs": 0,
         }
 
@@ -62,6 +64,7 @@ class Job(object):
             "crystals": 1.0,
             "admin": 1.0,
             "naval": 1.0,
+            "storage": 1.0,
             "jobs": 1.0,
         }
         self.production_constants = {
@@ -82,6 +85,7 @@ class Job(object):
             "crystals": 0,
             "admin": 0,
             "naval": 0,
+            "storage": 0,
             "jobs": 0,
         }
         self.upkeep_coefficients = {
@@ -102,6 +106,7 @@ class Job(object):
             "crystals": 1.0,
             "admin": 1.0,
             "naval": 1.0,
+            "storage": 1.0,
             "jobs": 1.0,
         }
         self.upkeep_constants = {
@@ -122,6 +127,7 @@ class Job(object):
             "crystals": 0,
             "admin": 0,
             "naval": 0,
+            "storage": 0,
             "jobs": 0,
         }
 

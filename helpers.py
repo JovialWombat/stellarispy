@@ -7,18 +7,13 @@ complete_planet_builds = []
 
 
 def solve_resource_equations(planets):
-    district_list = [
+    producers_list = [
         districts.CityDistrict(),
+        buildings.HyperEntertainmentForums(),
         districts.GeneratorDistrict(),
         districts.MiningDistrict(),
         districts.AgricultureDistrict(),
-    ]
-    max_district_production = []
-    for d in district_list:
-        max_district_production.append(d.aggregate_resources())
-    buildings_list = [
-        buildings.HyperEntertainmentForums(),
-        buildings.ResourceSilos(),
+        buildings.CommerceMegaplexes(),
         buildings.CivilianRepliComplexes(),
         buildings.AlloyNanoPlants(),
         buildings.HypercommsForum(),
@@ -28,17 +23,14 @@ def solve_resource_equations(planets):
         buildings.SyntheticCrystalPlants(),
         buildings.AdministrativePark(),
         buildings.Fortress(),
+        buildings.ResourceSilos(),
     ]
-    max_building_production = []
-    for b in buildings_list:
-        max_building_production.append(b.aggregate_resources())
-    districts_and_building_production = (
-        max_district_production + max_building_production
-    )
-
+    production = []
+    for p in producers_list:
+        production.append(p.aggregate_resources())
     array = []
     jobs = []
-    for p in districts_and_building_production:
+    for p in production:
         values = [v for k, v in p.items() if k != "jobs"]
         j = [v for k, v in p.items() if k == "jobs"]
         array.append(values)
@@ -66,6 +58,7 @@ def solve_resource_equations(planets):
         "crystals",
         "admin",
         "naval",
+        "storage",
     ]
     resource_relative_values = {}
     for index, name in enumerate(resource_names):
@@ -75,12 +68,13 @@ def solve_resource_equations(planets):
 
 def aggregate_production(complete_planet_builds, planet_build):
     production = {}
-    for p in complete_planet_builds:
-        for key, value in p.production.items():
-            if key not in production:
-                production[key] = value
-            else:
-                production[key] += value
+    if complete_planet_builds != None:
+        for p in complete_planet_builds:
+            for key, value in p.production.items():
+                if key not in production:
+                    production[key] = value
+                else:
+                    production[key] += value
     if planet_build != None:
         for key, value in planet_build.production.items():
             if key not in production:
@@ -91,14 +85,26 @@ def aggregate_production(complete_planet_builds, planet_build):
 
 
 def calculate_aggregate_error(
-    resource_relative_values, target_production_proportions, production
+    resource_relative_values, target_production_proportions, production, resource_mask
 ):
-    produced_value = {
-        key: production[key] * value
-        for (key, value) in resource_relative_values.items()
+    # mask off resources
+    production = {
+        key: value
+        for (key, value) in production.items() if key in resource_mask
     }
-    total_produced_value = sum(produced_value.values())
+    target_production_proportions = {
+        key: value
+        for (key, value) in target_production_proportions.items() if key in resource_mask
+    }
+
+    produced_value = {
+        key: resource_relative_values[key] * value
+        for (key, value) in production.items()
+    }
+    total_produced_value = abs(sum(produced_value.values()))
     total_target_proportions = sum(target_production_proportions.values())
+    if np.isclose(total_target_proportions,0):
+        total_target_proportions = 1.0
     errors = {
         key: value
         - (
@@ -109,6 +115,16 @@ def calculate_aggregate_error(
         for (key, value) in produced_value.items()
     }
     return errors
+
+def calculate_total_value(
+    resource_relative_values, production
+):
+    produced_value = {
+        key: production[key] * value
+        for (key, value) in resource_relative_values.items()
+    }
+    total_produced_value = sum(produced_value.values())
+    return total_produced_value
 
 
 possible_colony_designations = [

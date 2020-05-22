@@ -22,6 +22,7 @@ class Building(object):
         self.crystals = 0
         self.admin = 0
         self.naval = 0
+        self.storage = 0
         self.jobs_slots = []
 
     def aggregate_resources(self):
@@ -166,6 +167,14 @@ class Building(object):
                 + j.production_constants["naval"]
                 + (j.upkeep["naval"] * j.upkeep_coefficients["naval"])
                 + j.upkeep_constants["naval"]
+                for j in self.jobs_slots
+            ),
+            "storage": self.storage
+            + sum(
+                (j.production["storage"] * j.production_coefficients["storage"])
+                + j.production_constants["storage"]
+                + (j.upkeep["storage"] * j.upkeep_coefficients["storage"])
+                + j.upkeep_constants["storage"]
                 for j in self.jobs_slots
             ),
             "jobs": len(self.jobs_slots),
@@ -736,6 +745,7 @@ class ResourceSilos(Building):
         super().__init__()
         self.name = "ResourceSilos"
         self.energy = -1
+        self.storage = 2000
 
         self.clerks = 2
         self.maintenance_drones = 0

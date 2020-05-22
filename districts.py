@@ -21,6 +21,7 @@ class District(object):
         self.crystals = 0
         self.admin = -1
         self.naval = 0
+        self.storage = 0
         self.jobs_slots = []
 
     def aggregate_resources(self):
@@ -165,6 +166,14 @@ class District(object):
                 + j.production_constants["naval"]
                 + (j.upkeep["naval"] * j.upkeep_coefficients["naval"])
                 + j.upkeep_constants["naval"]
+                for j in self.jobs_slots
+            ),
+            "storage": self.storage
+            + sum(
+                (j.production["storage"] * j.production_coefficients["storage"])
+                + j.production_constants["storage"]
+                + (j.upkeep["storage"] * j.upkeep_coefficients["storage"])
+                + j.upkeep_constants["storage"]
                 for j in self.jobs_slots
             ),
             "jobs": len(self.jobs_slots),

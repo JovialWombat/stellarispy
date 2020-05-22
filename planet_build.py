@@ -44,6 +44,7 @@ class PlanetBuild(object):
             "crystals": 0,
             "admin": 0,
             "naval": 0,
+            "storage": 0,
             "jobs": 0,
         }
 
@@ -111,30 +112,50 @@ class PlanetBuild(object):
             for key, value in d.aggregate_resources().items():
                 self.production[key] += value
 
-    def balance_buildings(self):
-        production = helpers.aggregate_production(helpers.complete_planet_builds, self)
+    def balance_neutral_buildings(self):
+        production = helpers.aggregate_production(None, self)
         errors = helpers.calculate_aggregate_error(
             helpers.resource_relative_values,
             helpers.target_production_proportions,
             production,
+            ["trade", "naval", "storage"]
         )
         building_errors = {
             key: value
             for (key, value) in errors.items()
-            if key in ["food", "trade", "goods","alloys","unity","research","motes","gases","crystals","admin","naval"]
-            # if key
-            # in [
-            #     "trade",
-            #     "goods",
-            #     "alloys",
-            #     "unity",
-            #     "research",
-            #     "motes",
-            #     "gases",
-            #     "crystals",
-            #     "admin",
-            #     "naval",
-            # ]
+        }
+        lowest = min(building_errors, key=building_errors.get)
+        if lowest == "trade":
+            return bs.CommerceMegaplexes()
+        if lowest == "naval":
+            return bs.Fortress()
+        if lowest == "storage":
+            return bs.ResourceSilos()
+
+    def balance_buildings(self):
+        production = helpers.aggregate_production(None, self)
+        errors = helpers.calculate_aggregate_error(
+            helpers.resource_relative_values,
+            helpers.target_production_proportions,
+            production,
+            [
+                "food",
+                "trade",
+                "goods",
+                "alloys",
+                "unity",
+                "research",
+                "motes",
+                "gases",
+                "crystals",
+                "admin",
+                "naval",
+                "storage",
+            ]
+        )
+        building_errors = {
+            key: value
+            for (key, value) in errors.items()
         }
         lowest = min(building_errors, key=building_errors.get)
         if lowest == "food":
@@ -159,18 +180,19 @@ class PlanetBuild(object):
             return bs.AdministrativePark()
         if lowest == "naval":
             return bs.Fortress()
+        if lowest == "storage":
+            return bs.ResourceSilos()
 
     def balance_refineries(self):
-        production = helpers.aggregate_production(helpers.complete_planet_builds, self)
+        production = helpers.aggregate_production(None, self)
         errors = helpers.calculate_aggregate_error(
             helpers.resource_relative_values,
             helpers.target_production_proportions,
-            production,
+            production,["motes", "gases", "crystals",]
         )
         refinery_errors = {
             key: value
             for (key, value) in errors.items()
-            if key in ["motes", "gases", "crystals",]
         }
         lowest = min(refinery_errors, key=refinery_errors.get)
 
@@ -182,16 +204,15 @@ class PlanetBuild(object):
             return bs.SyntheticCrystalPlants()
 
     def balance_districts(self):
-        production = helpers.aggregate_production(helpers.complete_planet_builds, self)
+        production = helpers.aggregate_production(None, self)
         errors = helpers.calculate_aggregate_error(
             helpers.resource_relative_values,
             helpers.target_production_proportions,
-            production,
+            production,["energy", "minerals", "food",]
         )
         district_errors = {
             key: value
             for (key, value) in errors.items()
-            if key in ["energy", "minerals", "food",]
             # if key in ["energy", "minerals",]
         }
         lowest = min(district_errors, key=district_errors.get)
@@ -258,7 +279,6 @@ class MiningWorld(PlanetBuild):
         super().__init__(planet)
         self._designation = "MiningWorld"
 
-
     def apply_modifiers(self):
         for d in (
             self.city_districts
@@ -269,18 +289,17 @@ class MiningWorld(PlanetBuild):
         ):
             for j in d.jobs_slots:
                 if isinstance(j, jbs.Miner):
-                    for (key,value) in j.production_coefficients.items():    
+                    for (key, value) in j.production_coefficients.items():
                         value = self.production_coefficient
 
-                    # for (key,value) in j.production_constants.items():    
+                    # for (key,value) in j.production_constants.items():
                     #     value = self.production_constant
 
-                    # for (key,value) in j.upkeep_coefficients.items():    
+                    # for (key,value) in j.upkeep_coefficients.items():
                     #     value = self.upkeep_coefficient
 
-                    # for (key,value) in j.upkeep_constants.items():    
+                    # for (key,value) in j.upkeep_constants.items():
                     #     value = self.upkeep_constant
-                    
 
     def build_housing(self):
         if self.mining_districts_available():
@@ -319,14 +338,16 @@ class MiningWorld(PlanetBuild):
             if not any(isinstance(b, bs.MilitaryAcademy) for b in self.buildings):
                 self.buildings.append(bs.MilitaryAcademy())
 
-            self.buildings.append(self.balance_buildings())
+            self.buildings.append(self.balance_neutral_buildings())
+        elif self.districts_available():
+            self.balance_districts()
 
 
 class AgriWorld(PlanetBuild):
     def __init__(self, planet):
         super().__init__(planet)
         self._designation = "AgriWorld"
-        
+
     def apply_modifiers(self):
         for d in (
             self.city_districts
@@ -337,16 +358,16 @@ class AgriWorld(PlanetBuild):
         ):
             for j in d.jobs_slots:
                 if isinstance(j, jbs.Farmer):
-                    for (key,value) in j.production_coefficients.items():    
+                    for (key, value) in j.production_coefficients.items():
                         value = self.production_coefficient
 
-                    # for (key,value) in j.production_constants.items():    
+                    # for (key,value) in j.production_constants.items():
                     #     value = self.production_constant
 
-                    # for (key,value) in j.upkeep_coefficients.items():    
+                    # for (key,value) in j.upkeep_coefficients.items():
                     #     value = self.upkeep_coefficient
 
-                    # for (key,value) in j.upkeep_constants.items():    
+                    # for (key,value) in j.upkeep_constants.items():
                     #     value = self.upkeep_constant
 
     def build_housing(self):
@@ -385,6 +406,8 @@ class AgriWorld(PlanetBuild):
                 self.buildings.append(bs.MilitaryAcademy())
 
             self.buildings.append(bs.HydroponicsFarms())
+        elif self.districts_available():
+            self.balance_districts()
 
 
 class GeneratorWorld(PlanetBuild):
@@ -402,16 +425,16 @@ class GeneratorWorld(PlanetBuild):
         ):
             for j in d.jobs_slots:
                 if isinstance(j, jbs.Technician):
-                    for (key,value) in j.production_coefficients.items():    
+                    for (key, value) in j.production_coefficients.items():
                         value = self.production_coefficient
 
-                    # for (key,value) in j.production_constants.items():    
+                    # for (key,value) in j.production_constants.items():
                     #     value = self.production_constant
 
-                    # for (key,value) in j.upkeep_coefficients.items():    
+                    # for (key,value) in j.upkeep_coefficients.items():
                     #     value = self.upkeep_coefficient
 
-                    # for (key,value) in j.upkeep_constants.items():    
+                    # for (key,value) in j.upkeep_constants.items():
                     #     value = self.upkeep_constant
 
     def build_housing(self):
@@ -449,8 +472,8 @@ class GeneratorWorld(PlanetBuild):
             if not any(isinstance(b, bs.MilitaryAcademy) for b in self.buildings):
                 self.buildings.append(bs.MilitaryAcademy())
 
-            self.buildings.append(self.balance_buildings())
-        if self.districts_available():
+            self.buildings.append(self.balance_neutral_buildings())
+        elif self.districts_available():
             self.balance_districts()
 
 
@@ -469,16 +492,16 @@ class ForgeWorld(PlanetBuild):
         ):
             for j in d.jobs_slots:
                 if isinstance(j, jbs.Metallurgist):
-                    # for (key,value) in j.production_coefficients.items():    
+                    # for (key,value) in j.production_coefficients.items():
                     #     value = self.production_coefficient
 
-                    # for (key,value) in j.production_constants.items():    
+                    # for (key,value) in j.production_constants.items():
                     #     value = self.production_constant
 
-                    for (key,value) in j.upkeep_coefficients.items():    
+                    for (key, value) in j.upkeep_coefficients.items():
                         value = self.upkeep_coefficient
 
-                    # for (key,value) in j.upkeep_constants.items():    
+                    # for (key,value) in j.upkeep_constants.items():
                     #     value = self.upkeep_constant
 
     def build_housing(self):
@@ -513,7 +536,7 @@ class ForgeWorld(PlanetBuild):
                 self.buildings.append(bs.MilitaryAcademy())
 
             self.buildings.append(bs.AlloyNanoPlants())
-        if self.districts_available():
+        elif self.districts_available():
             self.balance_districts()
 
 
@@ -532,16 +555,16 @@ class IndustrialWorld(PlanetBuild):
         ):
             for j in d.jobs_slots:
                 if isinstance(j, jbs.Artisan):
-                    # for (key,value) in j.production_coefficients.items():    
+                    # for (key,value) in j.production_coefficients.items():
                     #     value = self.production_coefficient
 
-                    # for (key,value) in j.production_constants.items():    
+                    # for (key,value) in j.production_constants.items():
                     #     value = self.production_constant
 
-                    for (key,value) in j.upkeep_coefficients.items():    
+                    for (key, value) in j.upkeep_coefficients.items():
                         value = self.upkeep_coefficient
 
-                    # for (key,value) in j.upkeep_constants.items():    
+                    # for (key,value) in j.upkeep_constants.items():
                     #     value = self.upkeep_constant
 
     def build_housing(self):
@@ -576,7 +599,7 @@ class IndustrialWorld(PlanetBuild):
                 self.buildings.append(bs.MilitaryAcademy())
 
             self.buildings.append(bs.CivilianRepliComplexes())
-        if self.districts_available():
+        elif self.districts_available():
             self.balance_districts()
 
 
@@ -595,17 +618,21 @@ class RefineryWorld(PlanetBuild):
             + self.buildings
         ):
             for j in d.jobs_slots:
-                if isinstance(j, jbs.Chemist) or isinstance(j, jbs.GasRefiner) or isinstance(j, jbs.Translucer):
-                    # for (key,value) in j.production_coefficients.items():    
+                if (
+                    isinstance(j, jbs.Chemist)
+                    or isinstance(j, jbs.GasRefiner)
+                    or isinstance(j, jbs.Translucer)
+                ):
+                    # for (key,value) in j.production_coefficients.items():
                     #     value = self.production_coefficient
 
-                    # for (key,value) in j.production_constants.items():    
+                    # for (key,value) in j.production_constants.items():
                     #     value = self.production_constant
 
-                    for (key,value) in j.upkeep_coefficients.items():    
+                    for (key, value) in j.upkeep_coefficients.items():
                         value = self.upkeep_coefficient
 
-                    # for (key,value) in j.upkeep_constants.items():    
+                    # for (key,value) in j.upkeep_constants.items():
                     #     value = self.upkeep_constant
 
     def build_housing(self):
@@ -637,7 +664,7 @@ class RefineryWorld(PlanetBuild):
                 self.buildings.append(bs.MilitaryAcademy())
 
             self.buildings.append(self.balance_refineries())
-        if self.districts_available():
+        elif self.districts_available():
             self.balance_districts()
 
 
@@ -656,16 +683,16 @@ class TechWorld(PlanetBuild):
         ):
             for j in d.jobs_slots:
                 if isinstance(j, jbs.Researcher):
-                    # for (key,value) in j.production_coefficients.items():    
+                    # for (key,value) in j.production_coefficients.items():
                     #     value = self.production_coefficient
 
-                    # for (key,value) in j.production_constants.items():    
+                    # for (key,value) in j.production_constants.items():
                     #     value = self.production_constant
 
-                    for (key,value) in j.upkeep_coefficients.items():    
+                    for (key, value) in j.upkeep_coefficients.items():
                         value = self.upkeep_coefficient
 
-                    # for (key,value) in j.upkeep_constants.items():    
+                    # for (key,value) in j.upkeep_constants.items():
                     #     value = self.upkeep_constant
 
     def build_housing(self):
@@ -700,69 +727,71 @@ class TechWorld(PlanetBuild):
                 self.buildings.append(bs.MilitaryAcademy())
 
             self.buildings.append(bs.AdvancedResearchComplexes())
-        if self.districts_available():
+        elif self.districts_available():
             self.balance_districts()
 
 
-class FortressWorld(PlanetBuild):
-    def __init__(self, planet):
-        super().__init__(planet)
-        self._designation = "FortressWorld"
+# class FortressWorld(PlanetBuild):
+#     def __init__(self, planet):
+#         super().__init__(planet)
+#         self._designation = "FortressWorld"
 
-    def apply_modifiers(self):
-        pass
-        # for d in (
-        #     self.city_districts
-        #     + self.generator_districts
-        #     + self.mining_districts
-        #     + self.agriculture_districts
-        #     + self.buildings
-        # ):
-        #     for j in d.jobs_slots:
-        #         if isinstance(j, jbs.Chemist) or isinstance(j, jbs.GasRefiner) or isinstance(j, jbs.Translucer):
-        #             for (key,value) in j.production_coefficients.items():    
-        #                 value = self.production_coefficient
+#     def apply_modifiers(self):
+#         pass
+#         # for d in (
+#         #     self.city_districts
+#         #     + self.generator_districts
+#         #     + self.mining_districts
+#         #     + self.agriculture_districts
+#         #     + self.buildings
+#         # ):
+#         #     for j in d.jobs_slots:
+#         #         if isinstance(j, jbs.Chemist) or isinstance(j, jbs.GasRefiner) or isinstance(j, jbs.Translucer):
+#         #             for (key,value) in j.production_coefficients.items():
+#         #                 value = self.production_coefficient
 
-        #             for (key,value) in j.production_constants.items():    
-        #                 value = self.production_constant
+#         #             for (key,value) in j.production_constants.items():
+#         #                 value = self.production_constant
 
-        #             for (key,value) in j.upkeep_coefficients.items():    
-        #                 value = self.upkeep_coefficient
+#         #             for (key,value) in j.upkeep_coefficients.items():
+#         #                 value = self.upkeep_coefficient
 
-        #             for (key,value) in j.upkeep_constants.items():    
-        #                 value = self.upkeep_constant
+#         #             for (key,value) in j.upkeep_constants.items():
+#         #                 value = self.upkeep_constant
 
-    def build_housing(self):
-        if self.buildings_available():
-            self.buildings.append(bs.Fortress())
-        elif self.districts_available():
-            self.city_districts.append(districts.CityDistrict())
-        elif self.buildings_available():
-            self.buildings.append(bs.ParadiseDome())
+#     def build_housing(self):
+#         if self.buildings_available():
+#             self.buildings.append(bs.Fortress())
+#         elif self.districts_available():
+#             self.city_districts.append(districts.CityDistrict())
+#         elif self.buildings_available():
+#             self.buildings.append(bs.ParadiseDome())
 
-    def build_amenities(self):
-        if self.buildings_available():
-            self.buildings.append(bs.HyperEntertainmentForums())
-        elif self.districts_available():
-            self.city_districts.append(districts.CityDistrict())
+#     def build_amenities(self):
+#         if self.buildings_available():
+#             self.buildings.append(bs.HyperEntertainmentForums())
+#         elif self.districts_available():
+#             self.city_districts.append(districts.CityDistrict())
 
-    def build_in_priority_order(self):
-        if self.buildings_available():
-            if not any(isinstance(b, bs.RobotAssemblyPlants) for b in self.buildings):
-                self.buildings.append(bs.RobotAssemblyPlants())
+#     def build_in_priority_order(self):
+#         if self.buildings_available():
+#             if not any(isinstance(b, bs.RobotAssemblyPlants) for b in self.buildings):
+#                 self.buildings.append(bs.RobotAssemblyPlants())
 
-            if not any(
-                isinstance(b, bs.CytoRevitalizationCenter) for b in self.buildings
-            ):
-                self.buildings.append(bs.CytoRevitalizationCenter())
+#             if not any(
+#                 isinstance(b, bs.CytoRevitalizationCenter) for b in self.buildings
+#             ):
+#                 self.buildings.append(bs.CytoRevitalizationCenter())
 
-            if not any(isinstance(b, bs.AutoCuratingVault) for b in self.buildings):
-                self.buildings.append(bs.AutoCuratingVault())
+#             if not any(isinstance(b, bs.AutoCuratingVault) for b in self.buildings):
+#                 self.buildings.append(bs.AutoCuratingVault())
 
-            if not any(isinstance(b, bs.MilitaryAcademy) for b in self.buildings):
-                self.buildings.append(bs.MilitaryAcademy())
+#             if not any(isinstance(b, bs.MilitaryAcademy) for b in self.buildings):
+#                 self.buildings.append(bs.MilitaryAcademy())
 
-            self.buildings.append(bs.Fortress())
+#             self.buildings.append(bs.Fortress())
+#         elif self.districts_available():
+#             self.balance_districts()
 
 
 class BureaucraticWorld(PlanetBuild):
@@ -781,16 +810,16 @@ class BureaucraticWorld(PlanetBuild):
         ):
             for j in d.jobs_slots:
                 if isinstance(j, jbs.Bureaucrat):
-                    # for (key,value) in j.production_coefficients.items():    
+                    # for (key,value) in j.production_coefficients.items():
                     #     value = self.production_coefficient
 
-                    for (key,value) in j.production_constants.items():    
+                    for (key, value) in j.production_constants.items():
                         value = self.production_constant
 
-                    for (key,value) in j.upkeep_coefficients.items():    
+                    for (key, value) in j.upkeep_coefficients.items():
                         value = self.upkeep_coefficient
 
-                    # for (key,value) in j.upkeep_constants.items():    
+                    # for (key,value) in j.upkeep_constants.items():
                     #     value = self.upkeep_constant
 
     def build_housing(self):
@@ -822,7 +851,7 @@ class BureaucraticWorld(PlanetBuild):
                 self.buildings.append(bs.MilitaryAcademy())
 
             self.buildings.append(bs.AdministrativePark())
-        if self.districts_available():
+        elif self.districts_available():
             self.balance_districts()
 
 
@@ -842,16 +871,16 @@ class EmpireCapital(PlanetBuild):
         # ):
         #     for j in d.jobs_slots:
         #         if isinstance(j, jbs.Chemist) or isinstance(j, jbs.GasRefiner) or isinstance(j, jbs.Translucer):
-        #             for (key,value) in j.production_coefficients.items():    
+        #             for (key,value) in j.production_coefficients.items():
         #                 value = self.production_coefficient
 
-        #             for (key,value) in j.production_constants.items():    
+        #             for (key,value) in j.production_constants.items():
         #                 value = self.production_constant
 
-        #             for (key,value) in j.upkeep_coefficients.items():    
+        #             for (key,value) in j.upkeep_coefficients.items():
         #                 value = self.upkeep_coefficient
 
-        #             for (key,value) in j.upkeep_constants.items():    
+        #             for (key,value) in j.upkeep_constants.items():
         #                 value = self.upkeep_constant
 
     def build_housing(self):
@@ -885,6 +914,6 @@ class EmpireCapital(PlanetBuild):
             if not any(isinstance(b, bs.GrandEmbassyComplex) for b in self.buildings):
                 self.buildings.append(bs.GrandEmbassyComplex())
 
-            self.buildings.append(self.balance_buildings())
-        if self.districts_available():
+            self.buildings.append(self.balance_neutral_buildings())
+        elif self.districts_available():
             self.balance_districts()
