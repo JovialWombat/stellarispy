@@ -66,8 +66,6 @@ with open("input/{0}.json".format(empire_name)) as f:
     non_consumables_weight = 1.0
     # filter out any with these < 0
     minimisable_consumables = {
-        # "housing": 0,
-        # "amenities": 0,
         "food": 0,
         "goods": 0,
         "admin": 0,
@@ -85,6 +83,14 @@ with open("input/{0}.json".format(empire_name)) as f:
         "trade": 1.0,
         "unity": 1.0,
         "research": 1.0,
+        "naval": 1.0,
+        "storage": 1.0,
+    }
+    excluded = {
+        "housing": 0,
+        "amenities": 0,
+        "trade": 1.0,
+        "unity": 1.0,
         "naval": 1.0,
         "storage": 1.0,
     }
@@ -117,7 +123,15 @@ with open("input/{0}.json".format(empire_name)) as f:
 
     # target equal value produced from each resource
     helpers.target_production_proportions = {
-        key: helpers.resource_relative_values[key] * value / sum(helpers.resource_relative_values.values())
+        key: helpers.resource_relative_values[key]
+        * value
+        / sum(
+            {
+                k: v
+                for (k, v) in helpers.resource_relative_values.items()
+                if k in target_production_proportion.keys()
+            }.values()
+        )
         for (key, value) in target_production_proportion.items()
     }
 
@@ -174,8 +188,25 @@ with open("input/{0}.json".format(empire_name)) as f:
     possible_planet_builds = []
     for index, p in enumerate(planets):
         planet_builds = []
-        if index == 0:
-            planet_builds.append(planet_build.EmpireCapital(p))
+        if p.designation != "":
+            if p.designation == "EmpireCapital":
+                planet_builds.append(planet_build.EmpireCapital(p))
+            elif p.designation == "MiningWorld":
+                planet_builds.append(planet_build.MiningWorld(p))
+            elif p.designation == "AgriWorld":
+                planet_builds.append(planet_build.AgriWorld(p))
+            elif p.designation == "GeneratorWorld":
+                planet_builds.append(planet_build.GeneratorWorld(p))
+            elif p.designation == "ForgeWorld":
+                planet_builds.append(planet_build.ForgeWorld(p))
+            elif p.designation == "IndustrialWorld":
+                planet_builds.append(planet_build.IndustrialWorld(p))
+            elif p.designation == "RefineryWorld":
+                planet_builds.append(planet_build.RefineryWorld(p))
+            elif p.designation == "TechWorld":
+                planet_builds.append(planet_build.TechWorld(p))
+            elif p.designation == "BureaucraticWorld":
+                planet_builds.append(planet_build.BureaucraticWorld(p))
         else:
             for d in helpers.possible_colony_designations:
                 if d["name"] == "Mining World":
@@ -192,8 +223,6 @@ with open("input/{0}.json".format(empire_name)) as f:
                     planet_builds.append(planet_build.RefineryWorld(p))
                 elif d["name"] == "Tech World":
                     planet_builds.append(planet_build.TechWorld(p))
-                # elif d["name"] == "Fortress World":
-                #     planet_builds.append(planet_build.FortressWorld(p))
                 elif d["name"] == "Bureaucratic World":
                     planet_builds.append(planet_build.BureaucraticWorld(p))
         possible_planet_builds.append(planet_builds)
@@ -210,32 +239,37 @@ with open("input/{0}.json".format(empire_name)) as f:
         #     continue
 
         # calculate the error for this combination
-        minimisable_consumable_errors = helpers.calculate_aggregate_error(
+        # minimisable_consumable_errors = helpers.calculate_aggregate_error(
+        #     helpers.resource_relative_values,
+        #     helpers.target_production_proportions,
+        #     production,
+        #     minimisable_consumables.keys(),
+        # )
+        # maximisable_consumable_errors = helpers.calculate_aggregate_error(
+        #     helpers.resource_relative_values,
+        #     helpers.target_production_proportions,
+        #     production,
+        #     maximisable_consumables.keys(),
+        # )
+        # non_consumable_errors = helpers.calculate_aggregate_error(
+        #     helpers.resource_relative_values,
+        #     helpers.target_production_proportions,
+        #     production,
+        #     non_consumables.keys(),
+        # )
+        errors = helpers.calculate_aggregate_error(
             helpers.resource_relative_values,
             helpers.target_production_proportions,
             production,
-            minimisable_consumables.keys(),
-        )
-        maximisable_consumable_errors = helpers.calculate_aggregate_error(
-            helpers.resource_relative_values,
-            helpers.target_production_proportions,
-            production,
-            maximisable_consumables.keys(),
-        )
-        non_consumable_errors = helpers.calculate_aggregate_error(
-            helpers.resource_relative_values,
-            helpers.target_production_proportions,
-            production,
-            non_consumables.keys(),
+            list(minimisable_consumables.keys())
+            + list(maximisable_consumables.keys())
+            + list(non_consumables.keys())
+            + ["jobs"],
         )
 
         # total_value = helpers.calculate_total_value(helpers.resource_relative_values, production)
 
-        fit = (
-            sum([abs(v) for v in minimisable_consumable_errors.values()])
-            * sum([abs(v) for v in maximisable_consumable_errors.values()])
-            * sum([abs(v) for v in non_consumable_errors.values()])
-        )
+        fit = np.prod([abs(v) for v in errors.values()])
 
         if fit < best_fit:
             best_fit = fit
@@ -245,23 +279,32 @@ with open("input/{0}.json".format(empire_name)) as f:
     final_production = helpers.aggregate_production(best_build, None)
     export_data(final_production, "{0}-production".format(empire_name))
 
-    minimisable_consumable_errors = helpers.calculate_aggregate_error(
+    # minimisable_consumable_errors = helpers.calculate_aggregate_error(
+    #     helpers.resource_relative_values,
+    #     helpers.target_production_proportions,
+    #     production,
+    #     minimisable_consumables.keys(),
+    # )
+    # maximisable_consumable_errors = helpers.calculate_aggregate_error(
+    #     helpers.resource_relative_values,
+    #     helpers.target_production_proportions,
+    #     production,
+    #     maximisable_consumables.keys(),
+    # )
+    # non_consumable_errors = helpers.calculate_aggregate_error(
+    #     helpers.resource_relative_values,
+    #     helpers.target_production_proportions,
+    #     production,
+    #     non_consumables.keys(),
+    # )
+    errors = helpers.calculate_aggregate_error(
         helpers.resource_relative_values,
         helpers.target_production_proportions,
         production,
-        minimisable_consumables.keys(),
-    )
-    maximisable_consumable_errors = helpers.calculate_aggregate_error(
-        helpers.resource_relative_values,
-        helpers.target_production_proportions,
-        production,
-        maximisable_consumables.keys(),
-    )
-    non_consumable_errors = helpers.calculate_aggregate_error(
-        helpers.resource_relative_values,
-        helpers.target_production_proportions,
-        production,
-        non_consumables.keys(),
+        list(minimisable_consumables.keys())
+        + list(maximisable_consumables.keys())
+        + list(non_consumables.keys())
+        + ["jobs"],
     )
     # export_data(final_errors, "{0}-errors".format(empire_name))
 

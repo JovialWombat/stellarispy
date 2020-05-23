@@ -118,7 +118,7 @@ class PlanetBuild(object):
             helpers.resource_relative_values,
             helpers.target_production_proportions,
             production,
-            ["trade", "naval", "storage"]
+            ["trade", "naval", "storage", "jobs"]
         )
         building_errors = {
             key: value
@@ -150,7 +150,7 @@ class PlanetBuild(object):
                 "crystals",
                 "admin",
                 "naval",
-                "storage",
+                "storage","jobs",
             ]
         )
         building_errors = {
@@ -188,7 +188,7 @@ class PlanetBuild(object):
         errors = helpers.calculate_aggregate_error(
             helpers.resource_relative_values,
             helpers.target_production_proportions,
-            production,["motes", "gases", "crystals",]
+            production,["motes", "gases", "crystals","jobs",]
         )
         refinery_errors = {
             key: value
@@ -208,7 +208,7 @@ class PlanetBuild(object):
         errors = helpers.calculate_aggregate_error(
             helpers.resource_relative_values,
             helpers.target_production_proportions,
-            production,["energy", "minerals", "food",]
+            production,["energy", "minerals", "food","jobs",]
         )
         district_errors = {
             key: value

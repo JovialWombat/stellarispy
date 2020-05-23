@@ -3,6 +3,7 @@ import districts, buildings
 
 resource_relative_values = None
 target_production_proportions = None
+job_value = None
 complete_planet_builds = []
 
 
@@ -42,6 +43,7 @@ def solve_resource_equations(planets):
     # energy is element 2...
     energy_value = solution[2]
     in_terms_of_energy = [s[0] / energy_value[0] for s in solution]
+    in_terms_of_energy.append(1 / energy_value[0])
     resource_names = [
         "housing",
         "amenities",
@@ -59,6 +61,7 @@ def solve_resource_equations(planets):
         "admin",
         "naval",
         "storage",
+        "jobs",
     ]
     resource_relative_values = {}
     for index, name in enumerate(resource_names):
@@ -89,36 +92,32 @@ def calculate_aggregate_error(
 ):
     # mask off resources
     production = {
-        key: value
-        for (key, value) in production.items() if key in resource_mask
+        key: value for (key, value) in production.items() if key in resource_mask
     }
     target_production_proportions = {
         key: value
-        for (key, value) in target_production_proportions.items() if key in resource_mask
+        for (key, value) in target_production_proportions.items()
+        if key in resource_mask
     }
 
-    produced_value = {
-        key: resource_relative_values[key] * value
-        for (key, value) in production.items()
-    }
-    total_produced_value = abs(sum(produced_value.values()))
+    expected_value = production["jobs"] * resource_relative_values["jobs"]
     total_target_proportions = sum(target_production_proportions.values())
-    if np.isclose(total_target_proportions,0):
+    if np.isclose(total_target_proportions, 0):
         total_target_proportions = 1.0
     errors = {
-        key: value
+        key: (resource_relative_values[key] * value)
         - (
             target_production_proportions[key]
-            * total_produced_value
+            * expected_value
             / total_target_proportions
         )
-        for (key, value) in produced_value.items()
+        for (key, value) in production.items()
+        if key != "jobs"
     }
     return errors
 
-def calculate_total_value(
-    resource_relative_values, production
-):
+
+def calculate_total_value(resource_relative_values, production):
     produced_value = {
         key: production[key] * value
         for (key, value) in resource_relative_values.items()
