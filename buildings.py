@@ -5,29 +5,51 @@ import jobs
 class Building(object):
     def __init__(self):
         self.name = "Building"
-        self.housing = 0
-        self.amenities = 0
-        self.energy = 0
-        self.minerals = 0
-        self.food = 0
-        self.trade = 0
-        self.goods = 0
-        self.alloys = 0
-        self.unity = 0
-        self.physics = 0
-        self.society = 0
-        self.engineering = 0
-        self.motes = 0
-        self.gases = 0
-        self.crystals = 0
-        self.admin = 0
-        self.naval = 0
-        self.storage = 0
+        self.production = {
+            "housing": 0,
+            "amenities": 0,
+            "energy": 0,
+            "minerals": 0,
+            "food": 0,
+            "trade": 0,
+            "goods": 0,
+            "alloys": 0,
+            "unity": 0,
+            "physics": 0,
+            "society": 0,
+            "engineering": 0,
+            "motes": 0,
+            "gases": 0,
+            "crystals": 0,
+            "admin": 0,
+            "naval": 0,
+            "storage": 0,
+        }
+        self.upkeep = {
+            "housing": 0,
+            "amenities": 0,
+            "energy": 0,
+            "minerals": 0,
+            "food": 0,
+            "trade": 0,
+            "goods": 0,
+            "alloys": 0,
+            "unity": 0,
+            "physics": 0,
+            "society": 0,
+            "engineering": 0,
+            "motes": 0,
+            "gases": 0,
+            "crystals": 0,
+            "admin": 0,
+            "naval": 0,
+            "storage": 0,
+        }
         self.jobs_slots = []
 
     def aggregate_resources(self):
         return {
-            "housing": self.housing
+            "housing": self.production["housing"]+ self.upkeep["housing"]
             + sum(
                 (j.production["housing"] * j.production_coefficients["housing"])
                 + j.production_constants["housing"]
@@ -35,7 +57,7 @@ class Building(object):
                 + j.upkeep_constants["housing"]
                 for j in self.jobs_slots
             ),
-            "amenities": self.amenities
+            "amenities": self.production["amenities"]+ self.upkeep["amenities"]
             + sum(
                 (j.production["amenities"] * j.production_coefficients["amenities"])
                 + j.production_constants["amenities"]
@@ -43,7 +65,7 @@ class Building(object):
                 + j.upkeep_constants["amenities"]
                 for j in self.jobs_slots
             ),
-            "energy": self.energy
+            "energy": self.production["energy"]+ self.upkeep["energy"]
             + sum(
                 (j.production["energy"] * j.production_coefficients["energy"])
                 + j.production_constants["energy"]
@@ -51,7 +73,7 @@ class Building(object):
                 + j.upkeep_constants["energy"]
                 for j in self.jobs_slots
             ),
-            "minerals": self.minerals
+            "minerals": self.production["minerals"]+ self.upkeep["minerals"]
             + sum(
                 (j.production["minerals"] * j.production_coefficients["minerals"])
                 + j.production_constants["minerals"]
@@ -59,7 +81,7 @@ class Building(object):
                 + j.upkeep_constants["minerals"]
                 for j in self.jobs_slots
             ),
-            "food": self.food
+            "food": self.production["food"]+ self.upkeep["food"]
             + sum(
                 (j.production["food"] * j.production_coefficients["food"])
                 + j.production_constants["food"]
@@ -67,7 +89,7 @@ class Building(object):
                 + j.upkeep_constants["food"]
                 for j in self.jobs_slots
             ),
-            "trade": self.trade
+            "trade": self.production["trade"]+ self.upkeep["trade"]
             + sum(
                 (j.production["trade"] * j.production_coefficients["trade"])
                 + j.production_constants["trade"]
@@ -75,7 +97,7 @@ class Building(object):
                 + j.upkeep_constants["trade"]
                 for j in self.jobs_slots
             ),
-            "goods": self.goods
+            "goods": self.production["goods"]+ self.upkeep["goods"]
             + sum(
                 (j.production["goods"] * j.production_coefficients["goods"])
                 + j.production_constants["goods"]
@@ -83,7 +105,7 @@ class Building(object):
                 + j.upkeep_constants["goods"]
                 for j in self.jobs_slots
             ),
-            "alloys": self.alloys
+            "alloys": self.production["alloys"]+ self.upkeep["alloys"]
             + sum(
                 (j.production["alloys"] * j.production_coefficients["alloys"])
                 + j.production_constants["alloys"]
@@ -91,7 +113,7 @@ class Building(object):
                 + j.upkeep_constants["alloys"]
                 for j in self.jobs_slots
             ),
-            "unity": self.unity
+            "unity": self.production["unity"]+ self.upkeep["unity"]
             + sum(
                 (j.production["unity"] * j.production_coefficients["unity"])
                 + j.production_constants["unity"]
@@ -100,23 +122,23 @@ class Building(object):
                 for j in self.jobs_slots
             ),
             "research": (
-                self.physics
+                self.production["physics"]+ self.upkeep["physics"]
                 + sum(
                     (j.production["physics"] * j.production_coefficients["physics"])
                     + j.production_constants["physics"]
                     + (j.upkeep["physics"] * j.upkeep_coefficients["physics"])
                     + j.upkeep_constants["physics"]
                     for j in self.jobs_slots
-                )+
-                self.society
+                )
+                + self.production["society"]+ self.upkeep["society"]
                 + sum(
                     (j.production["society"] * j.production_coefficients["society"])
                     + j.production_constants["society"]
                     + (j.upkeep["society"] * j.upkeep_coefficients["society"])
                     + j.upkeep_constants["society"]
                     for j in self.jobs_slots
-                )+
-                self.engineering
+                )
+                + self.production["engineering"]+ self.upkeep["engineering"]
                 + sum(
                     (
                         j.production["engineering"]
@@ -129,7 +151,7 @@ class Building(object):
                 )
             )
             / 3,
-            "motes": self.motes
+            "motes": self.production["motes"]+ self.upkeep["motes"]
             + sum(
                 (j.production["motes"] * j.production_coefficients["motes"])
                 + j.production_constants["motes"]
@@ -137,7 +159,7 @@ class Building(object):
                 + j.upkeep_constants["motes"]
                 for j in self.jobs_slots
             ),
-            "gases": self.gases
+            "gases": self.production["gases"]+ self.upkeep["gases"]
             + sum(
                 (j.production["gases"] * j.production_coefficients["gases"])
                 + j.production_constants["gases"]
@@ -145,7 +167,7 @@ class Building(object):
                 + j.upkeep_constants["gases"]
                 for j in self.jobs_slots
             ),
-            "crystals": self.crystals
+            "crystals": self.production["crystals"]+ self.upkeep["crystals"]
             + sum(
                 (j.production["crystals"] * j.production_coefficients["crystals"])
                 + j.production_constants["crystals"]
@@ -153,7 +175,7 @@ class Building(object):
                 + j.upkeep_constants["crystals"]
                 for j in self.jobs_slots
             ),
-            "admin": self.admin
+            "admin": self.production["admin"]+ self.upkeep["admin"]
             + sum(
                 (j.production["admin"] * j.production_coefficients["admin"])
                 + j.production_constants["admin"]
@@ -161,7 +183,7 @@ class Building(object):
                 + j.upkeep_constants["admin"]
                 for j in self.jobs_slots
             ),
-            "naval": self.naval
+            "naval": self.production["naval"]+ self.upkeep["naval"]
             + sum(
                 (j.production["naval"] * j.production_coefficients["naval"])
                 + j.production_constants["naval"]
@@ -169,7 +191,7 @@ class Building(object):
                 + j.upkeep_constants["naval"]
                 for j in self.jobs_slots
             ),
-            "storage": self.storage
+            "storage": self.production["storage"]+ self.upkeep["storage"]
             + sum(
                 (j.production["storage"] * j.production_coefficients["storage"])
                 + j.production_constants["storage"]
@@ -180,15 +202,251 @@ class Building(object):
             "jobs": len(self.jobs_slots),
         }
 
+    def aggregate_production(self):
+        return {
+            "housing": self.production["housing"]
+            + sum(
+                (j.production["housing"] * j.production_coefficients["housing"])
+                + j.production_constants["housing"]
+                for j in self.jobs_slots
+            ),
+            "amenities": self.production["amenities"]
+            + sum(
+                (j.production["amenities"] * j.production_coefficients["amenities"])
+                + j.production_constants["amenities"]
+                for j in self.jobs_slots
+            ),
+            "energy": self.production["energy"]
+            + sum(
+                (j.production["energy"] * j.production_coefficients["energy"])
+                + j.production_constants["energy"]
+                for j in self.jobs_slots
+            ),
+            "minerals": self.production["minerals"]
+            + sum(
+                (j.production["minerals"] * j.production_coefficients["minerals"])
+                + j.production_constants["minerals"]
+                for j in self.jobs_slots
+            ),
+            "food": self.production["food"]
+            + sum(
+                (j.production["food"] * j.production_coefficients["food"])
+                + j.production_constants["food"]
+                for j in self.jobs_slots
+            ),
+            "trade": self.production["trade"]
+            + sum(
+                (j.production["trade"] * j.production_coefficients["trade"])
+                + j.production_constants["trade"]
+                for j in self.jobs_slots
+            ),
+            "goods": self.production["goods"]
+            + sum(
+                (j.production["goods"] * j.production_coefficients["goods"])
+                + j.production_constants["goods"]
+                for j in self.jobs_slots
+            ),
+            "alloys": self.production["alloys"]
+            + sum(
+                (j.production["alloys"] * j.production_coefficients["alloys"])
+                + j.production_constants["alloys"]
+                for j in self.jobs_slots
+            ),
+            "unity": self.production["unity"]
+            + sum(
+                (j.production["unity"] * j.production_coefficients["unity"])
+                + j.production_constants["unity"]
+                for j in self.jobs_slots
+            ),
+            "research": (
+                self.production["physics"]
+                + sum(
+                    (j.production["physics"] * j.production_coefficients["physics"])
+                    + j.production_constants["physics"]
+                    for j in self.jobs_slots
+                )
+                + self.production["society"]
+                + sum(
+                    (j.production["society"] * j.production_coefficients["society"])
+                    + j.production_constants["society"]
+                    for j in self.jobs_slots
+                )
+                + self.production["engineering"]
+                + sum(
+                    (
+                        j.production["engineering"]
+                        * j.production_coefficients["engineering"]
+                    )
+                    + j.production_constants["engineering"]
+                    for j in self.jobs_slots
+                )
+            )
+            / 3,
+            "motes": self.production["motes"]
+            + sum(
+                (j.production["motes"] * j.production_coefficients["motes"])
+                + j.production_constants["motes"]
+                for j in self.jobs_slots
+            ),
+            "gases": self.production["gases"]
+            + sum(
+                (j.production["gases"] * j.production_coefficients["gases"])
+                + j.production_constants["gases"]
+                for j in self.jobs_slots
+            ),
+            "crystals": self.production["crystals"]
+            + sum(
+                (j.production["crystals"] * j.production_coefficients["crystals"])
+                + j.production_constants["crystals"]
+                for j in self.jobs_slots
+            ),
+            "admin": self.production["admin"]
+            + sum(
+                (j.production["admin"] * j.production_coefficients["admin"])
+                + j.production_constants["admin"]
+                for j in self.jobs_slots
+            ),
+            "naval": self.production["naval"]
+            + sum(
+                (j.production["naval"] * j.production_coefficients["naval"])
+                + j.production_constants["naval"]
+                for j in self.jobs_slots
+            ),
+            "storage": self.production["storage"]
+            + sum(
+                (j.production["storage"] * j.production_coefficients["storage"])
+                + j.production_constants["storage"]
+                for j in self.jobs_slots
+            ),
+            "jobs": len(self.jobs_slots),
+        }
+    def aggregate_upkeep(self):
+        return {
+            "housing": self.upkeep["housing"]
+            + sum(
+                (j.upkeep["housing"] * j.upkeep_coefficients["housing"])
+                + j.upkeep_constants["housing"]
+                for j in self.jobs_slots
+            ),
+            "amenities": self.upkeep["amenities"]
+            + sum(
+                (j.upkeep["amenities"] * j.upkeep_coefficients["amenities"])
+                + j.upkeep_constants["amenities"]
+                for j in self.jobs_slots
+            ),
+            "energy": self.upkeep["energy"]
+            + sum(
+                (j.upkeep["energy"] * j.upkeep_coefficients["energy"])
+                + j.upkeep_constants["energy"]
+                for j in self.jobs_slots
+            ),
+            "minerals": self.upkeep["minerals"]
+            + sum(
+                (j.upkeep["minerals"] * j.upkeep_coefficients["minerals"])
+                + j.upkeep_constants["minerals"]
+                for j in self.jobs_slots
+            ),
+            "food": self.upkeep["food"]
+            + sum(
+                (j.upkeep["food"] * j.upkeep_coefficients["food"])
+                + j.upkeep_constants["food"]
+                for j in self.jobs_slots
+            ),
+            "trade": self.upkeep["trade"]
+            + sum(
+                (j.upkeep["trade"] * j.upkeep_coefficients["trade"])
+                + j.upkeep_constants["trade"]
+                for j in self.jobs_slots
+            ),
+            "goods": self.upkeep["goods"]
+            + sum(
+                (j.upkeep["goods"] * j.upkeep_coefficients["goods"])
+                + j.upkeep_constants["goods"]
+                for j in self.jobs_slots
+            ),
+            "alloys": self.upkeep["alloys"]
+            + sum(
+                (j.upkeep["alloys"] * j.upkeep_coefficients["alloys"])
+                + j.upkeep_constants["alloys"]
+                for j in self.jobs_slots
+            ),
+            "unity": self.upkeep["unity"]
+            + sum(
+                (j.upkeep["unity"] * j.upkeep_coefficients["unity"])
+                + j.upkeep_constants["unity"]
+                for j in self.jobs_slots
+            ),
+            "research": (
+                self.upkeep["physics"]
+                + sum(
+                    (j.upkeep["physics"] * j.upkeep_coefficients["physics"])
+                    + j.upkeep_constants["physics"]
+                    for j in self.jobs_slots
+                )
+                + self.upkeep["society"]
+                + sum(
+                    (j.upkeep["society"] * j.upkeep_coefficients["society"])
+                    + j.upkeep_constants["society"]
+                    for j in self.jobs_slots
+                )
+                + self.upkeep["engineering"]
+                + sum(
+                    (
+                        j.upkeep["engineering"]
+                        * j.upkeep_coefficients["engineering"]
+                    )
+                    + j.upkeep_constants["engineering"]
+                    for j in self.jobs_slots
+                )
+            )
+            / 3,
+            "motes": self.upkeep["motes"]
+            + sum(
+                (j.upkeep["motes"] * j.upkeep_coefficients["motes"])
+                + j.upkeep_constants["motes"]
+                for j in self.jobs_slots
+            ),
+            "gases": self.upkeep["gases"]
+            + sum(
+                (j.upkeep["gases"] * j.upkeep_coefficients["gases"])
+                + j.upkeep_constants["gases"]
+                for j in self.jobs_slots
+            ),
+            "crystals": self.upkeep["crystals"]
+            + sum(
+                (j.upkeep["crystals"] * j.upkeep_coefficients["crystals"])
+                + j.upkeep_constants["crystals"]
+                for j in self.jobs_slots
+            ),
+            "admin": self.upkeep["admin"]
+            + sum(
+                (j.upkeep["admin"] * j.upkeep_coefficients["admin"])
+                + j.upkeep_constants["admin"]
+                for j in self.jobs_slots
+            ),
+            "naval": self.upkeep["naval"]
+            + sum(
+                (j.upkeep["naval"] * j.upkeep_coefficients["naval"])
+                + j.upkeep_constants["naval"]
+                for j in self.jobs_slots
+            ),
+            "storage": self.upkeep["storage"]
+            + sum(
+                (j.upkeep["storage"] * j.upkeep_coefficients["storage"])
+                + j.upkeep_constants["storage"]
+                for j in self.jobs_slots
+            ),
+            "jobs": len(self.jobs_slots),
+        }
 
 class SystemCapitalComplex(Building):
     def __init__(self):
         super().__init__()
         self.name = "SystemCapitalComplex"
 
-        self.housing = 10
-        self.amenities = 10
-        self.energy = -10
+        self.production["housing"] = 10
+        self.production["amenities"] = 10
+        self.upkeep["energy"] = -10
 
         self.administrators = 4
         self.enforcers = 3
@@ -240,8 +498,8 @@ class AlloyNanoPlants(Building):
         super().__init__()
         self.name = "AlloyNanoPlants"
 
-        self.energy = -8
-        self.motes = -2
+        self.upkeep["energy"] = -8
+        self.upkeep["motes"] = -2
 
         self.metallurgists = 8
         self.foundry_drone = 0
@@ -269,8 +527,8 @@ class AdvancedResearchComplexes(Building):
         super().__init__()
         self.name = "AdvancedResearchComplexes"
 
-        self.energy = -8
-        self.gases = -2
+        self.upkeep["energy"] = -8
+        self.upkeep["gases"] = -2
 
         self.researchers = 8
         self.brain_drone = 0
@@ -297,8 +555,8 @@ class CivilianRepliComplexes(Building):
     def __init__(self):
         super().__init__()
         self.name = "CivilianRepliComplexes"
-        self.energy = -8
-        self.crystals = -2
+        self.upkeep["energy"] = -8
+        self.upkeep["crystals"] = -2
 
         self.artisans = 8
         self.artisan_drones = 0
@@ -317,8 +575,8 @@ class HypercommsForum(Building):
     def __init__(self):
         super().__init__()
         self.name = "HypercommsForum"
-        self.energy = -8
-        self.crystals = -2
+        self.upkeep["energy"] = -8
+        self.upkeep["crystals"] = -2
 
         self.culture_workers = 8
 
@@ -330,8 +588,8 @@ class SacredNexus(Building):
     def __init__(self):
         super().__init__()
         self.name = "SacredNexus"
-        self.energy = -8
-        self.crystals = -2
+        self.upkeep["energy"] = -8
+        self.upkeep["crystals"] = -2
 
         self.priests = 8
 
@@ -343,8 +601,8 @@ class SynergyForum(Building):
     def __init__(self):
         super().__init__()
         self.name = "SynergyForum"
-        self.energy = -8
-        self.crystals = -2
+        self.upkeep["energy"] = -8
+        self.upkeep["crystals"] = -2
 
         self.managers = 8
 
@@ -356,8 +614,8 @@ class ConfluenceOfThought(Building):
     def __init__(self):
         super().__init__()
         self.name = "ConfluenceOfThought"
-        self.energy = -8
-        self.gases = -2
+        self.upkeep["energy"] = -8
+        self.upkeep["gases"] = -2
 
         self.synapse_drones = 8
 
@@ -369,8 +627,8 @@ class SimulationComplex(Building):
     def __init__(self):
         super().__init__()
         self.name = "SimulationComplex"
-        self.energy = -8
-        self.crystals = -2
+        self.upkeep["energy"] = -8
+        self.upkeep["crystals"] = -2
 
         self.evaluators = 8
 
@@ -382,8 +640,8 @@ class HyperEntertainmentForums(Building):
     def __init__(self):
         super().__init__()
         self.name = "HyperEntertainmentForums"
-        self.energy = -5
-        self.gases = -1
+        self.upkeep["energy"] = -5
+        self.upkeep["gases"] = -1
 
         self.entertainers = 5
         self.duelists = 0
@@ -402,8 +660,8 @@ class AdministrativePark(Building):
     def __init__(self):
         super().__init__()
         self.name = "AdministrativePark"
-        self.energy = -5
-        self.crystals = -1
+        self.upkeep["energy"] = -5
+        self.upkeep["crystals"] = -1
 
         self.bureaucrats = 5
 
@@ -415,8 +673,8 @@ class SystemConflux(Building):
     def __init__(self):
         super().__init__()
         self.name = "SystemConflux"
-        self.energy = -8
-        self.crystals = -2
+        self.upkeep["energy"] = -8
+        self.upkeep["crystals"] = -2
 
         self.coordinators = 8
 
@@ -428,8 +686,8 @@ class HallOfJudgement(Building):
     def __init__(self):
         super().__init__()
         self.name = "HallOfJudgement"
-        self.energy = -5
-        self.gases = -1
+        self.upkeep["energy"] = -5
+        self.upkeep["gases"] = -1
 
         self.enforcers = 5
 
@@ -441,7 +699,7 @@ class SentinelPosts(Building):
     def __init__(self):
         super().__init__()
         self.name = "SentinelPosts"
-        self.energy = -2
+        self.upkeep["energy"] = -2
 
         self.hunter_seeker_drones = 2
 
@@ -453,7 +711,7 @@ class HydroponicsFarms(Building):
     def __init__(self):
         super().__init__()
         self.name = "HydroponicsFarms"
-        self.energy = -2
+        self.upkeep["energy"] = -2
 
         self.farmers = 2
         self.agri_drones = 0
@@ -472,8 +730,8 @@ class CommerceMegaplexes(Building):
     def __init__(self):
         super().__init__()
         self.name = "CommerceMegaplexes"
-        self.energy = -5
-        self.crystals = -1
+        self.upkeep["energy"] = -5
+        self.upkeep["crystals"] = -1
 
         self.clerks = 10
         self.merchants = 1
@@ -488,7 +746,7 @@ class ChemicalPlants(Building):
     def __init__(self):
         super().__init__()
         self.name = "ChemicalPlants"
-        self.energy = -3
+        self.upkeep["energy"] = -3
 
         self.chemists = 1
         self.chem_drones = 0
@@ -510,7 +768,7 @@ class ExoticGasRefineries(Building):
     def __init__(self):
         super().__init__()
         self.name = "ExoticGasRefineries"
-        self.energy = -3
+        self.upkeep["energy"] = -3
 
         self.gas_refiners = 1
         self.refinery_drones = 0
@@ -532,7 +790,7 @@ class SyntheticCrystalPlants(Building):
     def __init__(self):
         super().__init__()
         self.name = "SyntheticCrystalPlants"
-        self.energy = -3
+        self.upkeep["energy"] = -3
 
         self.translucers = 1
         self.lensing_drones = 0
@@ -554,48 +812,48 @@ class ParadiseDome(Building):
     def __init__(self):
         super().__init__()
         self.name = "ParadiseDome"
-        self.housing = 6
-        self.amenities = 10
-        self.energy = -3
-        self.crystals = -1
+        self.production["housing"] = 6
+        self.production["amenities"] = 10
+        self.upkeep["energy"] = -3
+        self.upkeep["crystals"] = -1
 
 
 class UtopianCommunalHousing(Building):
     def __init__(self):
         super().__init__()
         self.name = "UtopianCommunalHousing"
-        self.housing = 10
-        self.amenities = 6
-        self.energy = -3
-        self.crystals = -1
+        self.production["housing"] = 10
+        self.production["amenities"] = 6
+        self.upkeep["energy"] = -3
+        self.upkeep["crystals"] = -1
 
 
 class ExpandedWarren(Building):
     def __init__(self):
         super().__init__()
         self.name = "ExpandedWarren"
-        self.housing = 6
-        self.amenities = 10
-        self.energy = -3
-        self.crystals = -1
+        self.production["housing"] = 6
+        self.production["amenities"] = 10
+        self.upkeep["energy"] = -3
+        self.upkeep["crystals"] = -1
 
 
 class UpgradedDroneStorage(Building):
     def __init__(self):
         super().__init__()
         self.name = "UpgradedDroneStorage"
-        self.housing = 8
-        self.amenities = 6
-        self.energy = -3
-        self.crystals = -1
+        self.production["housing"] = 8
+        self.production["amenities"] = 6
+        self.upkeep["energy"] = -3
+        self.upkeep["crystals"] = -1
 
 
 class OrganicParadise(Building):
     def __init__(self):
         super().__init__()
         self.name = "OrganicParadise"
-        self.energy = -5
-        self.gases = -1
+        self.upkeep["energy"] = -5
+        self.upkeep["gases"] = -1
 
         self.bio_trophies = 1
         self.maintenance_drones = 0
@@ -610,9 +868,9 @@ class Fortress(Building):
     def __init__(self):
         super().__init__()
         self.name = "Fortress"
-        self.housing = 3
-        self.energy = -1
-        self.motes = -1
+        self.production["housing"] = 3
+        self.upkeep["energy"] = -1
+        self.upkeep["motes"] = -1
 
         self.soldiers = 3
         self.warrior_drones = 0
@@ -634,7 +892,7 @@ class BetharianPowerPlant(Building):
     def __init__(self):
         super().__init__()
         self.name = "BetharianPowerPlant"
-        self.energy = 10
+        self.production["energy"] = 10
 
         self.technicians = 4
         self.tech_drones = 0
@@ -656,7 +914,7 @@ class AlienZoo(Building):
     def __init__(self):
         super().__init__()
         self.name = "AlienZoo"
-        self.energy = -1
+        self.upkeep["energy"] = -1
 
         self.culture_workers = 2
         self.entertainers = 1
@@ -679,7 +937,7 @@ class CrystalMines(Building):
     def __init__(self):
         super().__init__()
         self.name = "CrystalMines"
-        self.energy = -1
+        self.upkeep["energy"] = -1
 
         self.crystal_miners = 1
         self.crystal_mining_drones = 0
@@ -701,7 +959,7 @@ class GasExtractionWells(Building):
     def __init__(self):
         super().__init__()
         self.name = "GasExtractionWells"
-        self.energy = -1
+        self.upkeep["energy"] = -1
 
         self.gas_extractors = 1
         self.gas_extraction_drones = 0
@@ -723,7 +981,7 @@ class MoteHarvestingTraps(Building):
     def __init__(self):
         super().__init__()
         self.name = "MoteHarvestingTraps"
-        self.energy = -1
+        self.upkeep["energy"] = -1
 
         self.mote_harvesters = 1
         self.mote_harvesting_drones = 0
@@ -744,8 +1002,8 @@ class ResourceSilos(Building):
     def __init__(self):
         super().__init__()
         self.name = "ResourceSilos"
-        self.energy = -1
-        self.storage = 2000
+        self.upkeep["energy"] = -1
+        self.production["storage"] = 2000
 
         self.clerks = 2
         self.maintenance_drones = 0
@@ -764,19 +1022,19 @@ class BioReactor(Building):
     def __init__(self):
         super().__init__()
         self.name = "BioReactor"
-        self.energy = 20
-        self.food = -25
+        self.production["energy"] = 20
+        self.upkeep["food"] = -25
 
 
 # class NaniteTransmuter(Building):
 #     def __init__(self):
 #         super().__init__()
 # self.name = "NaniteTransmuter"
-#         self.energy = -5
-#         self.food = 0
-#         self.motes = 2
-#         self.gases = 2
-#         self.crystals = 2
+#         self.upkeep["energy"] = -5
+#         self.production["food"] = 0
+#         self.production["motes"] = 2
+#         self.production["gases"] = 2
+#         self.production["crystals"] = 2
 #         self.nanites = -1
 
 
@@ -784,18 +1042,18 @@ class SlaveHuts(Building):
     def __init__(self):
         super().__init__()
         self.name = "SlaveHuts"
-        self.housing = 8
-        self.energy = -1
-        self.food = 0
+        self.production["housing"] = 8
+        self.upkeep["energy"] = -1
+        self.production["food"] = 0
 
 
 class OverseerResidences(Building):
     def __init__(self):
         super().__init__()
         self.name = "OverseerResidences"
-        self.housing = 2
-        self.energy = -1
-        self.food = 0
+        self.production["housing"] = 2
+        self.upkeep["energy"] = -1
+        self.production["food"] = 0
 
         self.slave_overseers = 2
         for j in range(self.slave_overseers):
@@ -811,14 +1069,14 @@ class PlanetaryShieldGenerator(UniqueBuilding):
     def __init__(self):
         super().__init__()
         self.name = "PlanetaryShieldGenerator"
-        self.energy = -5
+        self.upkeep["energy"] = -5
 
 
 class MilitaryAcademy(UniqueBuilding):
     def __init__(self):
         super().__init__()
         self.name = "MilitaryAcademy"
-        self.energy = -2
+        self.upkeep["energy"] = -2
 
         self.soldiers = 1
         self.warrior_drones = 0
@@ -839,8 +1097,8 @@ class EnergyNexus(UniqueBuilding):
     def __init__(self):
         super().__init__()
         self.name = "EnergyNexus"
-        self.energy = -2
-        self.gases = -1
+        self.upkeep["energy"] = -2
+        self.upkeep["gases"] = -1
 
         self.technicians = 2
         self.tech_drones = 0
@@ -861,8 +1119,8 @@ class MineralPurificationHubs(UniqueBuilding):
     def __init__(self):
         super().__init__()
         self.name = "MineralPurificationHubs"
-        self.energy = -2
-        self.motes = -1
+        self.upkeep["energy"] = -2
+        self.upkeep["motes"] = -1
 
         self.miners = 2
         self.mining_drones = 0
@@ -883,8 +1141,8 @@ class FoodProcessingCenters(UniqueBuilding):
     def __init__(self):
         super().__init__()
         self.name = "FoodProcessingCenters"
-        self.energy = -2
-        self.motes = -1
+        self.upkeep["energy"] = -2
+        self.upkeep["motes"] = -1
 
         self.farmers = 2
         self.agri_drones = 0
@@ -905,16 +1163,16 @@ class AutoCuratingVault(UniqueBuilding):
     def __init__(self):
         super().__init__()
         self.name = "AutoCuratingVault"
-        self.energy = -5
-        self.crystals = -1
+        self.upkeep["energy"] = -5
+        self.upkeep["crystals"] = -1
 
 
 class CitadelOfFaith(UniqueBuilding):
     def __init__(self):
         super().__init__()
         self.name = "CitadelOfFaith"
-        self.energy = -5
-        self.crystals = -1
+        self.upkeep["energy"] = -5
+        self.upkeep["crystals"] = -1
 
         self.priests = 5
         self.high_priests = 1
@@ -928,24 +1186,24 @@ class VaultOfAcquisitions(UniqueBuilding):
     def __init__(self):
         super().__init__()
         self.name = "VaultOfAcquisitions"
-        self.energy = -5
-        self.crystals = -1
+        self.upkeep["energy"] = -5
+        self.upkeep["crystals"] = -1
 
 
 class AlphaHub(UniqueBuilding):
     def __init__(self):
         super().__init__()
         self.name = "AlphaHub"
-        self.energy = -5
-        self.crystals = -1
+        self.upkeep["energy"] = -5
+        self.upkeep["crystals"] = -1
 
 
 class ResearchInstitute(UniqueBuilding):
     def __init__(self):
         super().__init__()
         self.name = "ResearchInstitute"
-        self.energy = -5
-        self.gases = -1
+        self.upkeep["energy"] = -5
+        self.upkeep["gases"] = -1
 
         self.science_directors = 1
         for j in range(self.science_directors):
@@ -956,8 +1214,8 @@ class PlanetarySupercomputer(UniqueBuilding):
     def __init__(self):
         super().__init__()
         self.name = "PlanetarySupercomputer"
-        self.energy = -5
-        self.gases = -1
+        self.upkeep["energy"] = -5
+        self.upkeep["gases"] = -1
 
         self.science_directors = 1
         self.brain_drones = 0
@@ -983,8 +1241,8 @@ class MinistryOfProduction(UniqueBuilding):
     def __init__(self):
         super().__init__()
         self.name = "MinistryOfProduction"
-        self.energy = -5
-        self.motes = -1
+        self.upkeep["energy"] = -5
+        self.upkeep["motes"] = -1
 
         self.administrators = 1
         for j in range(self.administrators):
@@ -995,8 +1253,8 @@ class ResourceProcessingCenter(UniqueBuilding):
     def __init__(self):
         super().__init__()
         self.name = "ResourceProcessingCenter"
-        self.energy = -5
-        self.motes = -1
+        self.upkeep["energy"] = -5
+        self.upkeep["motes"] = -1
 
         self.foundry_drones = 2
         self.fabricators = 0
@@ -1017,8 +1275,8 @@ class CytoRevitalizationCenter(UniqueBuilding):
     def __init__(self):
         super().__init__()
         self.name = "CytoRevitalizationCenter"
-        self.energy = -5
-        self.gases = -1
+        self.upkeep["energy"] = -5
+        self.upkeep["gases"] = -1
 
         self.medical_workers = 5
         for j in range(self.medical_workers):
@@ -1029,7 +1287,7 @@ class SpawningPools(UniqueBuilding):
     def __init__(self):
         super().__init__()
         self.name = "SpawningPools"
-        self.energy = -2
+        self.upkeep["energy"] = -2
 
         self.spawning_drones = 1
         for j in range(self.spawning_drones):
@@ -1040,7 +1298,7 @@ class RobotAssemblyPlants(UniqueBuilding):
     def __init__(self):
         super().__init__()
         self.name = "RobotAssemblyPlants"
-        self.energy = -5
+        self.upkeep["energy"] = -5
 
         self.roboticists = 1
         for j in range(self.roboticists):
@@ -1051,8 +1309,8 @@ class MachineAssemblyComplex(UniqueBuilding):
     def __init__(self):
         super().__init__()
         self.name = "MachineAssemblyComplex"
-        self.energy = -8
-        self.crystals = -2
+        self.upkeep["energy"] = -8
+        self.upkeep["crystals"] = -2
 
         self.replicators = 3
         for j in range(self.replicators):
@@ -1063,8 +1321,8 @@ class GalacticStockExchange(UniqueBuilding):
     def __init__(self):
         super().__init__()
         self.name = "GalacticStockExchange"
-        self.energy = -5
-        self.crystals = -1
+        self.upkeep["energy"] = -5
+        self.upkeep["crystals"] = -1
 
         self.merchants = 2
         for j in range(self.merchants):
@@ -1075,7 +1333,7 @@ class NobleEstates(UniqueBuilding):
     def __init__(self):
         super().__init__()
         self.name = "NobleEstates"
-        self.energy = -2
+        self.upkeep["energy"] = -2
 
         self.nobles = 1
         for j in range(self.nobles):
@@ -1086,21 +1344,21 @@ class SlaveProcessingFacility(UniqueBuilding):
     def __init__(self):
         super().__init__()
         self.name = "SlaveProcessingFacility"
-        self.energy = -2
+        self.upkeep["energy"] = -2
 
 
 class CloneVats(UniqueBuilding):
     def __init__(self):
         super().__init__()
         self.name = "CloneVats"
-        self.energy = -2
+        self.upkeep["energy"] = -2
 
 
 class PsiCorps(UniqueBuilding):
     def __init__(self):
         super().__init__()
         self.name = "PsiCorps"
-        self.energy = -5
+        self.upkeep["energy"] = -5
 
         self.telepaths = 2
         for j in range(self.telepaths):
@@ -1117,13 +1375,13 @@ class GrandEmbassyComplex(EmpireUniqueBuilding):
     def __init__(self):
         super().__init__()
         self.name = "GrandEmbassyComplex"
-        self.energy = -8
-        self.crystals = -2
+        self.upkeep["energy"] = -8
+        self.upkeep["crystals"] = -2
 
 
 class OmegaAlignment(EmpireUniqueBuilding):
     def __init__(self):
         super().__init__()
         self.name = "OmegaAlignment"
-        self.energy = -8
-        self.physics = 16
+        self.upkeep["energy"] = -8
+        self.production["physics"] = 16

@@ -27,11 +27,27 @@ class Job(object):
         self.upkeep = {
             "housing": -1,
             "amenities": -1,
+
+
             "energy": 0,
+            # machines
+            # "energy": -1,
+            
             "minerals": 0,
-            "food": -1,
+            # lithoids
+            "minerals": -1,
+
+            # humanoids  
+            # "food": -1,
+            # lithoids & machines
+            "food": 0,
+
             "trade": 0,
+
             "goods": -1,
+            # gestalt consciousness
+            # "goods": 0,
+
             "alloys": 0,
             "unity": 0,
             "physics": 0,

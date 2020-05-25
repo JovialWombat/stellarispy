@@ -75,15 +75,15 @@ def aggregate_production(complete_planet_builds, planet_build):
         for p in complete_planet_builds:
             for key, value in p.production.items():
                 if key not in production:
-                    production[key] = value
+                    production[key] = value + p.upkeep[key]
                 else:
-                    production[key] += value
+                    production[key] += value + p.upkeep[key]
     if planet_build != None:
         for key, value in planet_build.production.items():
             if key not in production:
-                production[key] = value
+                production[key] = value + planet_build.upkeep[key]
             else:
-                production[key] += value
+                production[key] += value + planet_build.upkeep[key]
     return production
 
 
@@ -100,7 +100,10 @@ def calculate_aggregate_error(
         if key in resource_mask
     }
 
-    expected_value = production["jobs"] * resource_relative_values["jobs"]
+    # expected_value = production["jobs"] * resource_relative_values["jobs"]
+    expected_value = sum(
+        {k: v * resource_relative_values[k] for (k, v) in production.items()}.values()
+    )
     total_target_proportions = sum(target_production_proportions.values())
     if np.isclose(total_target_proportions, 0):
         total_target_proportions = 1.0
@@ -111,16 +114,33 @@ def calculate_aggregate_error(
             * expected_value
             / total_target_proportions
         )
+        if (resource_relative_values[key] * value)
+        - (
+            target_production_proportions[key]
+            * expected_value
+            / total_target_proportions
+        )
+        < 0
+        else 0
         for (key, value) in production.items()
         if key != "jobs"
     }
+
     return errors
 
 
 def calculate_total_value(resource_relative_values, production):
+    excluded = [
+        "housing",
+        "amenities",
+        "trade",
+        "unity",
+        "naval",
+        "storage",
+        ]
     produced_value = {
         key: production[key] * value
-        for (key, value) in resource_relative_values.items()
+        for (key, value) in resource_relative_values.items() if key not in excluded
     }
     total_produced_value = sum(produced_value.values())
     return total_produced_value

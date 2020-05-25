@@ -4,29 +4,52 @@ import jobs
 
 class District(object):
     def __init__(self):
-        self.housing = 0
-        self.amenities = 0
-        self.energy = 0
-        self.minerals = 0
-        self.food = 0
-        self.trade = 0
-        self.goods = 0
-        self.alloys = 0
-        self.unity = 0
-        self.physics = 0
-        self.society = 0
-        self.engineering = 0
-        self.motes = 0
-        self.gases = 0
-        self.crystals = 0
-        self.admin = -1
-        self.naval = 0
-        self.storage = 0
+        self.name = "District"
+        self.production = {
+            "housing": 0,
+            "amenities": 0,
+            "energy": 0,
+            "minerals": 0,
+            "food": 0,
+            "trade": 0,
+            "goods": 0,
+            "alloys": 0,
+            "unity": 0,
+            "physics": 0,
+            "society": 0,
+            "engineering": 0,
+            "motes": 0,
+            "gases": 0,
+            "crystals": 0,
+            "admin": 0,
+            "naval": 0,
+            "storage": 0,
+        }
+        self.upkeep = {
+            "housing": 0,
+            "amenities": 0,
+            "energy": 0,
+            "minerals": 0,
+            "food": 0,
+            "trade": 0,
+            "goods": 0,
+            "alloys": 0,
+            "unity": 0,
+            "physics": 0,
+            "society": 0,
+            "engineering": 0,
+            "motes": 0,
+            "gases": 0,
+            "crystals": 0,
+            "admin": 0,
+            "naval": 0,
+            "storage": 0,
+        }
         self.jobs_slots = []
 
     def aggregate_resources(self):
         return {
-            "housing": self.housing
+            "housing": self.production["housing"]
             + sum(
                 (j.production["housing"] * j.production_coefficients["housing"])
                 + j.production_constants["housing"]
@@ -34,7 +57,7 @@ class District(object):
                 + j.upkeep_constants["housing"]
                 for j in self.jobs_slots
             ),
-            "amenities": self.amenities
+            "amenities": self.production["amenities"]
             + sum(
                 (j.production["amenities"] * j.production_coefficients["amenities"])
                 + j.production_constants["amenities"]
@@ -42,7 +65,7 @@ class District(object):
                 + j.upkeep_constants["amenities"]
                 for j in self.jobs_slots
             ),
-            "energy": self.energy
+            "energy": self.production["energy"]
             + sum(
                 (j.production["energy"] * j.production_coefficients["energy"])
                 + j.production_constants["energy"]
@@ -50,7 +73,7 @@ class District(object):
                 + j.upkeep_constants["energy"]
                 for j in self.jobs_slots
             ),
-            "minerals": self.minerals
+            "minerals": self.production["minerals"]
             + sum(
                 (j.production["minerals"] * j.production_coefficients["minerals"])
                 + j.production_constants["minerals"]
@@ -58,7 +81,7 @@ class District(object):
                 + j.upkeep_constants["minerals"]
                 for j in self.jobs_slots
             ),
-            "food": self.food
+            "food": self.production["food"]
             + sum(
                 (j.production["food"] * j.production_coefficients["food"])
                 + j.production_constants["food"]
@@ -66,7 +89,7 @@ class District(object):
                 + j.upkeep_constants["food"]
                 for j in self.jobs_slots
             ),
-            "trade": self.trade
+            "trade": self.production["trade"]
             + sum(
                 (j.production["trade"] * j.production_coefficients["trade"])
                 + j.production_constants["trade"]
@@ -74,7 +97,7 @@ class District(object):
                 + j.upkeep_constants["trade"]
                 for j in self.jobs_slots
             ),
-            "goods": self.goods
+            "goods": self.production["goods"]
             + sum(
                 (j.production["goods"] * j.production_coefficients["goods"])
                 + j.production_constants["goods"]
@@ -82,7 +105,7 @@ class District(object):
                 + j.upkeep_constants["goods"]
                 for j in self.jobs_slots
             ),
-            "alloys": self.alloys
+            "alloys": self.production["alloys"]
             + sum(
                 (j.production["alloys"] * j.production_coefficients["alloys"])
                 + j.production_constants["alloys"]
@@ -90,7 +113,7 @@ class District(object):
                 + j.upkeep_constants["alloys"]
                 for j in self.jobs_slots
             ),
-            "unity": self.unity
+            "unity": self.production["unity"]
             + sum(
                 (j.production["unity"] * j.production_coefficients["unity"])
                 + j.production_constants["unity"]
@@ -99,23 +122,23 @@ class District(object):
                 for j in self.jobs_slots
             ),
             "research": (
-                self.physics
+                self.production["physics"]
                 + sum(
                     (j.production["physics"] * j.production_coefficients["physics"])
                     + j.production_constants["physics"]
                     + (j.upkeep["physics"] * j.upkeep_coefficients["physics"])
                     + j.upkeep_constants["physics"]
                     for j in self.jobs_slots
-                )+
-                self.society
+                )
+                + self.production["society"]
                 + sum(
                     (j.production["society"] * j.production_coefficients["society"])
                     + j.production_constants["society"]
                     + (j.upkeep["society"] * j.upkeep_coefficients["society"])
                     + j.upkeep_constants["society"]
                     for j in self.jobs_slots
-                )+
-                self.engineering
+                )
+                + self.production["engineering"]
                 + sum(
                     (
                         j.production["engineering"]
@@ -128,7 +151,7 @@ class District(object):
                 )
             )
             / 3,
-            "motes": self.motes
+            "motes": self.production["motes"]
             + sum(
                 (j.production["motes"] * j.production_coefficients["motes"])
                 + j.production_constants["motes"]
@@ -136,7 +159,7 @@ class District(object):
                 + j.upkeep_constants["motes"]
                 for j in self.jobs_slots
             ),
-            "gases": self.gases
+            "gases": self.production["gases"]
             + sum(
                 (j.production["gases"] * j.production_coefficients["gases"])
                 + j.production_constants["gases"]
@@ -144,7 +167,7 @@ class District(object):
                 + j.upkeep_constants["gases"]
                 for j in self.jobs_slots
             ),
-            "crystals": self.crystals
+            "crystals": self.production["crystals"]
             + sum(
                 (j.production["crystals"] * j.production_coefficients["crystals"])
                 + j.production_constants["crystals"]
@@ -152,7 +175,7 @@ class District(object):
                 + j.upkeep_constants["crystals"]
                 for j in self.jobs_slots
             ),
-            "admin": self.admin
+            "admin": self.production["admin"]
             + sum(
                 (j.production["admin"] * j.production_coefficients["admin"])
                 + j.production_constants["admin"]
@@ -160,7 +183,7 @@ class District(object):
                 + j.upkeep_constants["admin"]
                 for j in self.jobs_slots
             ),
-            "naval": self.naval
+            "naval": self.production["naval"]
             + sum(
                 (j.production["naval"] * j.production_coefficients["naval"])
                 + j.production_constants["naval"]
@@ -168,7 +191,7 @@ class District(object):
                 + j.upkeep_constants["naval"]
                 for j in self.jobs_slots
             ),
-            "storage": self.storage
+            "storage": self.production["storage"]
             + sum(
                 (j.production["storage"] * j.production_coefficients["storage"])
                 + j.production_constants["storage"]
@@ -179,25 +202,263 @@ class District(object):
             "jobs": len(self.jobs_slots),
         }
 
+    def aggregate_production(self):
+        return {
+            "housing": self.production["housing"]
+            + sum(
+                (j.production["housing"] * j.production_coefficients["housing"])
+                + j.production_constants["housing"]
+                for j in self.jobs_slots
+            ),
+            "amenities": self.production["amenities"]
+            + sum(
+                (j.production["amenities"] * j.production_coefficients["amenities"])
+                + j.production_constants["amenities"]
+                for j in self.jobs_slots
+            ),
+            "energy": self.production["energy"]
+            + sum(
+                (j.production["energy"] * j.production_coefficients["energy"])
+                + j.production_constants["energy"]
+                for j in self.jobs_slots
+            ),
+            "minerals": self.production["minerals"]
+            + sum(
+                (j.production["minerals"] * j.production_coefficients["minerals"])
+                + j.production_constants["minerals"]
+                for j in self.jobs_slots
+            ),
+            "food": self.production["food"]
+            + sum(
+                (j.production["food"] * j.production_coefficients["food"])
+                + j.production_constants["food"]
+                for j in self.jobs_slots
+            ),
+            "trade": self.production["trade"]
+            + sum(
+                (j.production["trade"] * j.production_coefficients["trade"])
+                + j.production_constants["trade"]
+                for j in self.jobs_slots
+            ),
+            "goods": self.production["goods"]
+            + sum(
+                (j.production["goods"] * j.production_coefficients["goods"])
+                + j.production_constants["goods"]
+                for j in self.jobs_slots
+            ),
+            "alloys": self.production["alloys"]
+            + sum(
+                (j.production["alloys"] * j.production_coefficients["alloys"])
+                + j.production_constants["alloys"]
+                for j in self.jobs_slots
+            ),
+            "unity": self.production["unity"]
+            + sum(
+                (j.production["unity"] * j.production_coefficients["unity"])
+                + j.production_constants["unity"]
+                for j in self.jobs_slots
+            ),
+            "research": (
+                self.production["physics"]
+                + sum(
+                    (j.production["physics"] * j.production_coefficients["physics"])
+                    + j.production_constants["physics"]
+                    for j in self.jobs_slots
+                )
+                + self.production["society"]
+                + sum(
+                    (j.production["society"] * j.production_coefficients["society"])
+                    + j.production_constants["society"]
+                    for j in self.jobs_slots
+                )
+                + self.production["engineering"]
+                + sum(
+                    (
+                        j.production["engineering"]
+                        * j.production_coefficients["engineering"]
+                    )
+                    + j.production_constants["engineering"]
+                    for j in self.jobs_slots
+                )
+            )
+            / 3,
+            "motes": self.production["motes"]
+            + sum(
+                (j.production["motes"] * j.production_coefficients["motes"])
+                + j.production_constants["motes"]
+                for j in self.jobs_slots
+            ),
+            "gases": self.production["gases"]
+            + sum(
+                (j.production["gases"] * j.production_coefficients["gases"])
+                + j.production_constants["gases"]
+                for j in self.jobs_slots
+            ),
+            "crystals": self.production["crystals"]
+            + sum(
+                (j.production["crystals"] * j.production_coefficients["crystals"])
+                + j.production_constants["crystals"]
+                for j in self.jobs_slots
+            ),
+            "admin": self.production["admin"]
+            + sum(
+                (j.production["admin"] * j.production_coefficients["admin"])
+                + j.production_constants["admin"]
+                for j in self.jobs_slots
+            ),
+            "naval": self.production["naval"]
+            + sum(
+                (j.production["naval"] * j.production_coefficients["naval"])
+                + j.production_constants["naval"]
+                for j in self.jobs_slots
+            ),
+            "storage": self.production["storage"]
+            + sum(
+                (j.production["storage"] * j.production_coefficients["storage"])
+                + j.production_constants["storage"]
+                for j in self.jobs_slots
+            ),
+            "jobs": len(self.jobs_slots),
+        }
+
+    def aggregate_upkeep(self):
+        return {
+            "housing": self.upkeep["housing"]
+            + sum(
+                (j.upkeep["housing"] * j.upkeep_coefficients["housing"])
+                + j.upkeep_constants["housing"]
+                for j in self.jobs_slots
+            ),
+            "amenities": self.upkeep["amenities"]
+            + sum(
+                (j.upkeep["amenities"] * j.upkeep_coefficients["amenities"])
+                + j.upkeep_constants["amenities"]
+                for j in self.jobs_slots
+            ),
+            "energy": self.upkeep["energy"]
+            + sum(
+                (j.upkeep["energy"] * j.upkeep_coefficients["energy"])
+                + j.upkeep_constants["energy"]
+                for j in self.jobs_slots
+            ),
+            "minerals": self.upkeep["minerals"]
+            + sum(
+                (j.upkeep["minerals"] * j.upkeep_coefficients["minerals"])
+                + j.upkeep_constants["minerals"]
+                for j in self.jobs_slots
+            ),
+            "food": self.upkeep["food"]
+            + sum(
+                (j.upkeep["food"] * j.upkeep_coefficients["food"])
+                + j.upkeep_constants["food"]
+                for j in self.jobs_slots
+            ),
+            "trade": self.upkeep["trade"]
+            + sum(
+                (j.upkeep["trade"] * j.upkeep_coefficients["trade"])
+                + j.upkeep_constants["trade"]
+                for j in self.jobs_slots
+            ),
+            "goods": self.upkeep["goods"]
+            + sum(
+                (j.upkeep["goods"] * j.upkeep_coefficients["goods"])
+                + j.upkeep_constants["goods"]
+                for j in self.jobs_slots
+            ),
+            "alloys": self.upkeep["alloys"]
+            + sum(
+                (j.upkeep["alloys"] * j.upkeep_coefficients["alloys"])
+                + j.upkeep_constants["alloys"]
+                for j in self.jobs_slots
+            ),
+            "unity": self.upkeep["unity"]
+            + sum(
+                (j.upkeep["unity"] * j.upkeep_coefficients["unity"])
+                + j.upkeep_constants["unity"]
+                for j in self.jobs_slots
+            ),
+            "research": (
+                self.upkeep["physics"]
+                + sum(
+                    (j.upkeep["physics"] * j.upkeep_coefficients["physics"])
+                    + j.upkeep_constants["physics"]
+                    for j in self.jobs_slots
+                )
+                + self.upkeep["society"]
+                + sum(
+                    (j.upkeep["society"] * j.upkeep_coefficients["society"])
+                    + j.upkeep_constants["society"]
+                    for j in self.jobs_slots
+                )
+                + self.upkeep["engineering"]
+                + sum(
+                    (
+                        j.upkeep["engineering"]
+                        * j.upkeep_coefficients["engineering"]
+                    )
+                    + j.upkeep_constants["engineering"]
+                    for j in self.jobs_slots
+                )
+            )
+            / 3,
+            "motes": self.upkeep["motes"]
+            + sum(
+                (j.upkeep["motes"] * j.upkeep_coefficients["motes"])
+                + j.upkeep_constants["motes"]
+                for j in self.jobs_slots
+            ),
+            "gases": self.upkeep["gases"]
+            + sum(
+                (j.upkeep["gases"] * j.upkeep_coefficients["gases"])
+                + j.upkeep_constants["gases"]
+                for j in self.jobs_slots
+            ),
+            "crystals": self.upkeep["crystals"]
+            + sum(
+                (j.upkeep["crystals"] * j.upkeep_coefficients["crystals"])
+                + j.upkeep_constants["crystals"]
+                for j in self.jobs_slots
+            ),
+            "admin": self.upkeep["admin"]
+            + sum(
+                (j.upkeep["admin"] * j.upkeep_coefficients["admin"])
+                + j.upkeep_constants["admin"]
+                for j in self.jobs_slots
+            ),
+            "naval": self.upkeep["naval"]
+            + sum(
+                (j.upkeep["naval"] * j.upkeep_coefficients["naval"])
+                + j.upkeep_constants["naval"]
+                for j in self.jobs_slots
+            ),
+            "storage": self.upkeep["storage"]
+            + sum(
+                (j.upkeep["storage"] * j.upkeep_coefficients["storage"])
+                + j.upkeep_constants["storage"]
+                for j in self.jobs_slots
+            ),
+            "jobs": len(self.jobs_slots),
+        }
 
 class CityDistrict(District):
     def __init__(self):
         super().__init__()
-        self.housing = 5
-        self.energy = -2
+        self.name = "CityDistrict"
+        self.production["housing"] = 5
+        self.upkeep["energy"] = -2
 
         self.clerks = 1
 
         if "agrarian_idyll" in modifiers.civics:
-            self.housing -= 1
+            self.production["housing"] -= 1
         if "public_works" in modifiers.traditions:
-            self.housing += 1
+            self.production["housing"] += 1
         if "trans_stellar_corporations" in modifiers.traditions:
             self.clerks += 1
         if "weather_control_systems" in modifiers.research:
-            self.housing += 1
+            self.production["housing"] += 1
         if "anti_gravity_engineering" in modifiers.research:
-            self.housing += 1
+            self.production["housing"] += 1
 
         for j in range(self.clerks):
             self.jobs_slots.append(jobs.Clerk())
@@ -206,25 +467,26 @@ class CityDistrict(District):
 class HiveDistrict(District):
     def __init__(self):
         super().__init__()
-        self.housing = 6
-        self.energy = -2
+        self.name = "HiveDistrict"
+        self.production["housing"] = 6
+        self.upkeep["energy"] = -2
 
         self.maintenance_drones = 3
 
         if "hive_world" in modifiers.planet_type:
-            self.housing = 12
+            self.production["housing"] = 12
             self.maintenance_drones = 6
 
         if "agrarian_idyll" in modifiers.civics:
-            self.housing -= 1
+            self.production["housing"] -= 1
         if "public_works" in modifiers.traditions:
-            self.housing += 1
+            self.production["housing"] += 1
         # if "trans_stellar_corporations" in modifiers.traditions:
         #     self.clerks += 1
         if "weather_control_systems" in modifiers.research:
-            self.housing += 1
+            self.production["housing"] += 1
         if "anti_gravity_engineering" in modifiers.research:
-            self.housing += 1
+            self.production["housing"] += 1
             self.maintenance_drones += 1
 
         for j in range(self.maintenance_drones):
@@ -234,21 +496,23 @@ class HiveDistrict(District):
 class NexusDistrict(District):
     def __init__(self):
         super().__init__()
-        self.housing = 5
-        self.energy = -2
+        self.name = "NexusDistrict"
+
+        self.production["housing"] = 5
+        self.upkeep["energy"] = -2
 
         self.maintenance_drones = 3
 
         if "agrarian_idyll" in modifiers.civics:
-            self.housing -= 1
+            self.production["housing"] -= 1
         if "public_works" in modifiers.traditions:
-            self.housing += 1
+            self.production["housing"] += 1
         # if "trans_stellar_corporations" in modifiers.traditions:
         #     self.clerks += 1
         if "weather_control_systems" in modifiers.research:
-            self.housing += 1
+            self.production["housing"] += 1
         if "anti_gravity_engineering" in modifiers.research:
-            self.housing += 1
+            self.production["housing"] += 1
             self.maintenance_drones += 1
 
         for j in range(self.maintenance_drones):
@@ -258,22 +522,24 @@ class NexusDistrict(District):
 class GeneratorDistrict(District):
     def __init__(self):
         super().__init__()
-        self.housing = 2
+        self.name = "GeneratorDistrict"
 
-        self.energy = -1
+        self.production["housing"] = 2
+
+        self.upkeep["energy"] = -1
 
         self.technicians = 2
         self.tech_drones = 0
 
         if "machine_intelligence" in modifiers.authority:
-            self.housing = 3
+            self.production["housing"] = 3
             self.technicians = 0
             self.tech_drones = 2
         if "hive_mind" in modifiers.authority:
             self.technicians = 0
             self.tech_drones = 3
         if "agrarian_idyll" in modifiers.civics:
-            self.housing = 3
+            self.production["housing"] = 3
 
         for c in range(self.technicians):
             self.jobs_slots.append(jobs.Technician())
@@ -284,22 +550,23 @@ class GeneratorDistrict(District):
 class MiningDistrict(District):
     def __init__(self):
         super().__init__()
-        self.housing = 2
+        self.name = "MiningDistrict"
+        self.production["housing"] = 2
 
-        self.energy = -1
+        self.upkeep["energy"] = -1
 
         self.miners = 2
         self.mining_drones = 0
 
         if "machine_intelligence" in modifiers.authority:
-            self.housing = 3
+            self.production["housing"] = 3
             self.miners = 0
             self.mining_drones = 2
         if "hive_mind" in modifiers.authority:
             self.miners = 0
             self.mining_drones = 3
         if "agrarian_idyll" in modifiers.civics:
-            self.housing = 3
+            self.production["housing"] = 3
 
         for c in range(self.miners):
             self.jobs_slots.append(jobs.Miner())
@@ -310,24 +577,25 @@ class MiningDistrict(District):
 class AgricultureDistrict(District):
     def __init__(self):
         super().__init__()
-        self.housing = 2
+        self.name = "AgricultureDistrict"
+        self.production["housing"] = 2
 
-        self.energy = -1
+        self.upkeep["energy"] = -1
 
         self.farmers = 2
         self.agri_drones = 0
 
         if "machine_intelligence" in modifiers.authority:
-            self.housing = 3
+            self.production["housing"] = 3
             self.farmers = 0
             self.agri_drones = 2
         if "hive_mind" in modifiers.authority:
             self.farmers = 0
             self.agri_drones = 3
         if "agrarian_idyll" in modifiers.civics:
-            self.housing = 3
+            self.production["housing"] = 3
             if "agrarian_utopias" in modifiers.research:
-                self.housing = 4
+                self.production["housing"] = 4
 
         for c in range(self.farmers):
             self.jobs_slots.append(jobs.Farmer())

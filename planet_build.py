@@ -22,6 +22,7 @@ class PlanetBuild(object):
         self._mining_districts = None
         self._agriculture_districts = None
         self._buildings = None
+        self._jobs = None
 
         self.city_districts = []
         self.generator_districts = []
@@ -29,6 +30,25 @@ class PlanetBuild(object):
         self.agriculture_districts = []
         self.buildings = [bs.SystemCapitalComplex()]
         self.production = {
+            "housing": 0,
+            "amenities": 0,
+            "energy": 0,
+            "minerals": 0,
+            "food": 0,
+            "trade": 0,
+            "goods": 0,
+            "alloys": 0,
+            "unity": 0,
+            "research": 0,
+            "motes": 0,
+            "gases": 0,
+            "crystals": 0,
+            "admin": 0,
+            "naval": 0,
+            "storage": 0,
+            "jobs": 0,
+        }
+        self.upkeep = {
             "housing": 0,
             "amenities": 0,
             "energy": 0,
@@ -61,6 +81,7 @@ class PlanetBuild(object):
         self._mining_districts = len(self.mining_districts)
         self._agriculture_districts = len(self.agriculture_districts)
         self._buildings = [b.name for b in self.buildings]
+        self._jobs = self.production["jobs"]
 
     # TODO: empire capital designation fixed on one planet
     def build_planet(self):
@@ -74,9 +95,9 @@ class PlanetBuild(object):
             self.build()
 
     def build(self):
-        if self.production["housing"] <= 0:
+        if self.production["housing"]+self.upkeep["housing"] <= 0:
             self.build_housing()
-        elif self.production["amenities"] <= 0:
+        elif self.production["amenities"]+self.upkeep["amenities"] <= 0:
             self.build_amenities()
         else:
             self.build_in_priority_order()
@@ -98,10 +119,12 @@ class PlanetBuild(object):
     def update_planet_build(self):
         self.apply_modifiers()
         for key in self.production.keys():
-            if key == "admin":
-                self.production[key] = -5
-            else:
                 self.production[key] = 0
+        for key in self.upkeep.keys():
+            if key == "admin":
+                self.upkeep[key] = -5
+            else:
+                self.upkeep[key] = 0
         for d in (
             self.city_districts
             + self.generator_districts
@@ -109,114 +132,143 @@ class PlanetBuild(object):
             + self.agriculture_districts
             + self.buildings
         ):
-            for key, value in d.aggregate_resources().items():
+            for key, value in d.aggregate_production().items():
                 self.production[key] += value
+            for key, value in d.aggregate_upkeep().items():
+                self.upkeep[key] += value
 
     def balance_neutral_buildings(self):
-        production = helpers.aggregate_production(None, self)
-        errors = helpers.calculate_aggregate_error(
-            helpers.resource_relative_values,
-            helpers.target_production_proportions,
-            production,
-            ["trade", "naval", "storage", "jobs"]
-        )
-        building_errors = {
-            key: value
-            for (key, value) in errors.items()
-        }
-        lowest = min(building_errors, key=building_errors.get)
-        if lowest == "trade":
+        # production = helpers.aggregate_production(None, self)
+        # produced_value = {
+        #     k: v * helpers.resource_relative_values[k]
+        #     for (k, v) in production.items() if k in ["trade", "naval", "storage", "jobs"]
+        # }
+        ok_names = ["CommerceMegaplexes", "Fortress", "ResourceSilos"]
+        names = [b.name for b in self.buildings]
+        counts = Counter(names)
+        lowest_key = ""
+        lowest_value = float("inf")
+        for n in ok_names:
+            if counts[n] < lowest_value:
+                lowest_value = counts[n]
+                lowest_key = n
+        if lowest_key == "CommerceMegaplexes":
             return bs.CommerceMegaplexes()
-        if lowest == "naval":
+        if lowest_key == "Fortress":
             return bs.Fortress()
-        if lowest == "storage":
+        if lowest_key == "ResourceSilos":
             return bs.ResourceSilos()
 
     def balance_buildings(self):
-        production = helpers.aggregate_production(None, self)
-        errors = helpers.calculate_aggregate_error(
-            helpers.resource_relative_values,
-            helpers.target_production_proportions,
-            production,
-            [
-                "food",
-                "trade",
-                "goods",
-                "alloys",
-                "unity",
-                "research",
-                "motes",
-                "gases",
-                "crystals",
-                "admin",
-                "naval",
-                "storage","jobs",
-            ]
-        )
-        building_errors = {
-            key: value
-            for (key, value) in errors.items()
-        }
-        lowest = min(building_errors, key=building_errors.get)
-        if lowest == "food":
-            return bs.HydroponicsFarms()
-        if lowest == "trade":
-            return bs.CommerceMegaplexes()
-        if lowest == "goods":
+        # production = helpers.aggregate_production(None, self)
+        # produced_value = {
+        #     k: v * helpers.resource_relative_values[k]
+        #     for (k, v) in production.items() if k in [
+        #         "food",
+        #         "trade",
+        #         "goods",
+        #         "alloys",
+        #         "unity",
+        #         "research",
+        #         "motes",
+        #         "gases",
+        #         "crystals",
+        #         "admin",
+        #         "naval",
+        #         "storage","jobs",
+        #     ]
+        # }
+
+        # lithoid
+        # ok_names = [
+        #     "CivilianRepliComplexes",
+        #     "AlloyNanoPlants",
+        #     "HypercommsForum",
+        #     "AdvancedResearchComplexes",
+        #     "AdministrativePark",
+        # ]
+        ok_names = [
+            "CivilianRepliComplexes",
+            "AlloyNanoPlants",
+            "SynergyForum",
+            "AdvancedResearchComplexes",
+            "AdministrativePark",
+        ]
+        names = [b.name for b in self.buildings]
+        counts = Counter(names)
+        lowest_key = ""
+        lowest_value = float("inf")
+        for n in ok_names:
+            if counts[n] < lowest_value:
+                lowest_value = counts[n]
+                lowest_key = n
+
+
+        if lowest_key == "CivilianRepliComplexes":
             return bs.CivilianRepliComplexes()
-        if lowest == "alloys":
+        if lowest_key == "AlloyNanoPlants":
             return bs.AlloyNanoPlants()
-        if lowest == "unity":
-            return bs.HypercommsForum()
-        if lowest == "research":
+        # megacorp
+        # if lowest_key == "HypercommsForum":
+        #     return bs.HypercommsForum()
+        if lowest_key == "SynergyForum":
+            return bs.SynergyForum()
+        if lowest_key == "AdvancedResearchComplexes":
             return bs.AdvancedResearchComplexes()
-        if lowest == "motes":
-            return bs.ChemicalPlants()
-        if lowest == "gases":
-            return bs.ExoticGasRefineries()
-        if lowest == "crystals":
-            return bs.SyntheticCrystalPlants()
-        if lowest == "admin":
+        if lowest_key == "AdministrativePark":
             return bs.AdministrativePark()
-        if lowest == "naval":
-            return bs.Fortress()
-        if lowest == "storage":
-            return bs.ResourceSilos()
 
     def balance_refineries(self):
-        production = helpers.aggregate_production(None, self)
-        errors = helpers.calculate_aggregate_error(
-            helpers.resource_relative_values,
-            helpers.target_production_proportions,
-            production,["motes", "gases", "crystals","jobs",]
-        )
-        refinery_errors = {
-            key: value
-            for (key, value) in errors.items()
-        }
-        lowest = min(refinery_errors, key=refinery_errors.get)
-
-        if lowest == "motes":
+        # production = helpers.aggregate_production(None, self)
+        # produced_value = {
+        #     k: v * helpers.resource_relative_values[k]
+        #     for (k, v) in production.items()
+        #     if k in ["motes", "gases", "crystals", "jobs",]
+        # }
+        # lowest = min(produced_value, key=produced_value.get)
+        ok_names = [
+            "ChemicalPlants",
+            "ExoticGasRefineries",
+            "SyntheticCrystalPlants",
+        ]
+        names = [b.name for b in self.buildings]
+        counts = Counter(names)
+        lowest_key = ""
+        lowest_value = float("inf")       
+        for n in ok_names:
+            if counts[n] < lowest_value:
+                lowest_value = counts[n]
+                lowest_key = n 
+        if lowest_key == "ChemicalPlants":
             return bs.ChemicalPlants()
-        if lowest == "gases":
+        if lowest_key == "ExoticGasRefineries":
             return bs.ExoticGasRefineries()
-        if lowest == "crystals":
+        if lowest_key == "SyntheticCrystalPlants":
             return bs.SyntheticCrystalPlants()
 
     def balance_districts(self):
-        production = helpers.aggregate_production(None, self)
-        errors = helpers.calculate_aggregate_error(
-            helpers.resource_relative_values,
-            helpers.target_production_proportions,
-            production,["energy", "minerals", "food","jobs",]
-        )
-        district_errors = {
-            key: value
-            for (key, value) in errors.items()
-            # if key in ["energy", "minerals",]
-        }
-        lowest = min(district_errors, key=district_errors.get)
+        ok_names = [
+            "GeneratorDistrict",
+            "MiningDistrict",
+            # lithoid
+            # "AgricultureDistrict",
+        ]
+        names = [b.name for b in self.generator_districts + self.mining_districts + self.agriculture_districts]
+        counts = Counter(names)
+        lowest_key = ""
+        lowest_value = float("inf")       
+        for n in ok_names:
+            if counts[n] < lowest_value:
+                lowest_value = counts[n]
+                lowest_key = n 
 
+        # production = helpers.aggregate_production(None, self)
+        # produced_value = {
+        #     k: v * helpers.resource_relative_values[k]
+        #     for (k, v) in production.items()
+        #     if k in ["energy", "minerals", "food", "jobs",]
+        # }
+        # lowest = min(produced_value, key=produced_value.get)
         count_available = []
         if self.generator_districts_available():
             count_available.append(len(self.generator_districts))
@@ -226,13 +278,13 @@ class PlanetBuild(object):
             count_available.append(len(self.agriculture_districts))
 
         if len(count_available) != 0:
-            if self.generator_districts_available() and lowest == "energy":
+            if self.generator_districts_available() and lowest_key == "GeneratorDistrict":
                 self.generator_districts.append(districts.GeneratorDistrict())
                 return
-            if self.mining_districts_available() and lowest == "minerals":
+            if self.mining_districts_available() and lowest_key == "MiningDistrict":
                 self.mining_districts.append(districts.MiningDistrict())
                 return
-            if self.agriculture_districts_available() and lowest == "food":
+            if self.agriculture_districts_available() and lowest_key == "AgricultureDistrict":
                 self.agriculture_districts.append(districts.AgricultureDistrict())
                 return
         self.city_districts.append(districts.CityDistrict())
@@ -332,8 +384,11 @@ class MiningWorld(PlanetBuild):
             ):
                 self.buildings.append(bs.MineralPurificationHubs())
 
-            if not any(isinstance(b, bs.AutoCuratingVault) for b in self.buildings):
-                self.buildings.append(bs.AutoCuratingVault())
+            # megacorp
+            if not any(isinstance(b, bs.VaultOfAcquisitions) for b in self.buildings):
+                self.buildings.append(bs.VaultOfAcquisitions())
+            # if not any(isinstance(b, bs.AutoCuratingVault) for b in self.buildings):
+            #     self.buildings.append(bs.AutoCuratingVault())
 
             if not any(isinstance(b, bs.MilitaryAcademy) for b in self.buildings):
                 self.buildings.append(bs.MilitaryAcademy())
@@ -399,8 +454,11 @@ class AgriWorld(PlanetBuild):
             if not any(isinstance(b, bs.FoodProcessingCenters) for b in self.buildings):
                 self.buildings.append(bs.FoodProcessingCenters())
 
-            if not any(isinstance(b, bs.AutoCuratingVault) for b in self.buildings):
-                self.buildings.append(bs.AutoCuratingVault())
+            # megacorp
+            if not any(isinstance(b, bs.VaultOfAcquisitions) for b in self.buildings):
+                self.buildings.append(bs.VaultOfAcquisitions())
+            # if not any(isinstance(b, bs.AutoCuratingVault) for b in self.buildings):
+            #     self.buildings.append(bs.AutoCuratingVault())
 
             if not any(isinstance(b, bs.MilitaryAcademy) for b in self.buildings):
                 self.buildings.append(bs.MilitaryAcademy())
@@ -466,8 +524,11 @@ class GeneratorWorld(PlanetBuild):
             if not any(isinstance(b, bs.EnergyNexus) for b in self.buildings):
                 self.buildings.append(bs.EnergyNexus())
 
-            if not any(isinstance(b, bs.AutoCuratingVault) for b in self.buildings):
-                self.buildings.append(bs.AutoCuratingVault())
+            # megacorp
+            if not any(isinstance(b, bs.VaultOfAcquisitions) for b in self.buildings):
+                self.buildings.append(bs.VaultOfAcquisitions())
+            # if not any(isinstance(b, bs.AutoCuratingVault) for b in self.buildings):
+            #     self.buildings.append(bs.AutoCuratingVault())
 
             if not any(isinstance(b, bs.MilitaryAcademy) for b in self.buildings):
                 self.buildings.append(bs.MilitaryAcademy())
@@ -529,8 +590,11 @@ class ForgeWorld(PlanetBuild):
             if not any(isinstance(b, bs.MinistryOfProduction) for b in self.buildings):
                 self.buildings.append(bs.MinistryOfProduction())
 
-            if not any(isinstance(b, bs.AutoCuratingVault) for b in self.buildings):
-                self.buildings.append(bs.AutoCuratingVault())
+            # megacorp
+            if not any(isinstance(b, bs.VaultOfAcquisitions) for b in self.buildings):
+                self.buildings.append(bs.VaultOfAcquisitions())
+            # if not any(isinstance(b, bs.AutoCuratingVault) for b in self.buildings):
+            #     self.buildings.append(bs.AutoCuratingVault())
 
             if not any(isinstance(b, bs.MilitaryAcademy) for b in self.buildings):
                 self.buildings.append(bs.MilitaryAcademy())
@@ -592,8 +656,11 @@ class IndustrialWorld(PlanetBuild):
             if not any(isinstance(b, bs.MinistryOfProduction) for b in self.buildings):
                 self.buildings.append(bs.MinistryOfProduction())
 
-            if not any(isinstance(b, bs.AutoCuratingVault) for b in self.buildings):
-                self.buildings.append(bs.AutoCuratingVault())
+            # megacorp
+            if not any(isinstance(b, bs.VaultOfAcquisitions) for b in self.buildings):
+                self.buildings.append(bs.VaultOfAcquisitions())
+            # if not any(isinstance(b, bs.AutoCuratingVault) for b in self.buildings):
+            #     self.buildings.append(bs.AutoCuratingVault())
 
             if not any(isinstance(b, bs.MilitaryAcademy) for b in self.buildings):
                 self.buildings.append(bs.MilitaryAcademy())
@@ -657,8 +724,11 @@ class RefineryWorld(PlanetBuild):
             ):
                 self.buildings.append(bs.CytoRevitalizationCenter())
 
-            if not any(isinstance(b, bs.AutoCuratingVault) for b in self.buildings):
-                self.buildings.append(bs.AutoCuratingVault())
+            # megacorp
+            if not any(isinstance(b, bs.VaultOfAcquisitions) for b in self.buildings):
+                self.buildings.append(bs.VaultOfAcquisitions())
+            # if not any(isinstance(b, bs.AutoCuratingVault) for b in self.buildings):
+            #     self.buildings.append(bs.AutoCuratingVault())
 
             if not any(isinstance(b, bs.MilitaryAcademy) for b in self.buildings):
                 self.buildings.append(bs.MilitaryAcademy())
@@ -720,8 +790,11 @@ class TechWorld(PlanetBuild):
             if not any(isinstance(b, bs.ResearchInstitute) for b in self.buildings):
                 self.buildings.append(bs.ResearchInstitute())
 
-            if not any(isinstance(b, bs.AutoCuratingVault) for b in self.buildings):
-                self.buildings.append(bs.AutoCuratingVault())
+            # megacorp
+            if not any(isinstance(b, bs.VaultOfAcquisitions) for b in self.buildings):
+                self.buildings.append(bs.VaultOfAcquisitions())
+            # if not any(isinstance(b, bs.AutoCuratingVault) for b in self.buildings):
+            #     self.buildings.append(bs.AutoCuratingVault())
 
             if not any(isinstance(b, bs.MilitaryAcademy) for b in self.buildings):
                 self.buildings.append(bs.MilitaryAcademy())
@@ -783,8 +856,11 @@ class TechWorld(PlanetBuild):
 #             ):
 #                 self.buildings.append(bs.CytoRevitalizationCenter())
 
-#             if not any(isinstance(b, bs.AutoCuratingVault) for b in self.buildings):
-#                 self.buildings.append(bs.AutoCuratingVault())
+            # megacorp
+            # if not any(isinstance(b, bs.VaultOfAcquisitions) for b in self.buildings):
+            #     self.buildings.append(bs.VaultOfAcquisitions())
+            # if not any(isinstance(b, bs.AutoCuratingVault) for b in self.buildings):
+            #     self.buildings.append(bs.AutoCuratingVault())
 
 #             if not any(isinstance(b, bs.MilitaryAcademy) for b in self.buildings):
 #                 self.buildings.append(bs.MilitaryAcademy())
@@ -844,8 +920,11 @@ class BureaucraticWorld(PlanetBuild):
             ):
                 self.buildings.append(bs.CytoRevitalizationCenter())
 
-            if not any(isinstance(b, bs.AutoCuratingVault) for b in self.buildings):
-                self.buildings.append(bs.AutoCuratingVault())
+            # megacorp
+            if not any(isinstance(b, bs.VaultOfAcquisitions) for b in self.buildings):
+                self.buildings.append(bs.VaultOfAcquisitions())
+            # if not any(isinstance(b, bs.AutoCuratingVault) for b in self.buildings):
+            #     self.buildings.append(bs.AutoCuratingVault())
 
             if not any(isinstance(b, bs.MilitaryAcademy) for b in self.buildings):
                 self.buildings.append(bs.MilitaryAcademy())
@@ -896,7 +975,9 @@ class EmpireCapital(PlanetBuild):
             self.city_districts.append(districts.CityDistrict())
 
     def build_in_priority_order(self):
-        if self.buildings_available():
+        if self.districts_available():
+            self.balance_districts()
+        elif self.buildings_available():
             if not any(isinstance(b, bs.RobotAssemblyPlants) for b in self.buildings):
                 self.buildings.append(bs.RobotAssemblyPlants())
 
@@ -905,8 +986,11 @@ class EmpireCapital(PlanetBuild):
             ):
                 self.buildings.append(bs.CytoRevitalizationCenter())
 
-            if not any(isinstance(b, bs.AutoCuratingVault) for b in self.buildings):
-                self.buildings.append(bs.AutoCuratingVault())
+            # megacorp
+            if not any(isinstance(b, bs.VaultOfAcquisitions) for b in self.buildings):
+                self.buildings.append(bs.VaultOfAcquisitions())
+            # if not any(isinstance(b, bs.AutoCuratingVault) for b in self.buildings):
+            #     self.buildings.append(bs.AutoCuratingVault())
 
             if not any(isinstance(b, bs.MilitaryAcademy) for b in self.buildings):
                 self.buildings.append(bs.MilitaryAcademy())
@@ -914,6 +998,4 @@ class EmpireCapital(PlanetBuild):
             if not any(isinstance(b, bs.GrandEmbassyComplex) for b in self.buildings):
                 self.buildings.append(bs.GrandEmbassyComplex())
 
-            self.buildings.append(self.balance_neutral_buildings())
-        elif self.districts_available():
-            self.balance_districts()
+            self.buildings.append(self.balance_buildings())
